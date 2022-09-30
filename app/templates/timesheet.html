@@ -1,0 +1,89 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    {% load humanize %}
+    <div class="container-fluid border mt-4">
+        <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-between">
+            <div class="col-3 border rounded-4">
+                <h2>{{ user.first_name }}'s Timesheet</h2>
+                <h3 class="fw-normal">Today: {{ today|date:'D m/d/Y' }}</h3>
+                <h3 class="fw-normal">Week: {{ week_beg|date:'D m/d/Y' }} - {{ week_end|date:'D m/d/Y' }}</h3>
+            </div>
+            <div class="col-3 border rounded-4 pt-3">
+                <h4 class="text-center">Weekly Hours Total</h4>
+                <h1 class="display-1 text-center">{{ total_hours.sum_of_hours }}</h1>
+            </div>
+
+            <div class="col-3 border rounded-4">
+                <h5>Hours By Type:</h5>
+                <h4 class="fw-normal">Fixed-Fee: {{ fixed_hours.sum_of_hours }}</h4>
+                <h4 class="fw-normal">Hourly: {{ hourly_hours.sum_of_hours }}</h4>
+                <h4 class="fw-normal">Contingency: {{ contigency_hours.sum_of_hours }}</h4>
+                <h4 class="fw-normal">Non-Billable: {{ non_hours.sum_of_hours }}</h4>
+            </div>
+
+        </div>
+
+        <div class="row srg-bg-secondary rounded-4 mt-4 p-2 py-2">
+            <form id="form-container" method="POST">
+            {% csrf_token %}
+                <table class="table table-bordered">
+                    <thead>
+                        <tr class="text-center">
+                            <th>Employee</th>
+                            <th>Date</th>
+                            <th>Provider</th>
+                            <th>Time Code</th>
+                            <th style="width:50px">Hours</th>
+                            <th>Type</th>
+                            <th>FYE</th>
+                            <th>Note</th>
+                        </tr>
+                    </thead>
+                    {{ timesheet_formset.management_form }}
+                    {% for form in timesheet_formset %}
+                        <tr class="timesheet-form">
+                            {% for field in form.visible_fields %}
+                                <td>{{ field }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </table>
+
+                <button class="btn btn-primary" type="submit">Save Timesheet</button>
+            </form>
+        </div>
+
+
+        <div class="row srg-bg-secondary rounded-4 mt-4">
+            <table class="table text-center table-bordered">
+                <thead>
+                    <tr class="text-center">
+                        <th>Employee</th>
+                        <th>Date</th>
+                        <th>Provider</th>
+                        <th>Time Code</th>
+                        <th>Hours</th>
+                        <th>Type</th>
+                        <th>FYE</th>
+                        <th>Note</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rec in current_timesheet %}
+                        <tr>
+                            <td>{{ rec.employee_id }}</td>
+                            <td>{{ rec.date|date:'m/d/Y' }}</td>
+                            <td class="text-start">{{ rec.provider_id }}</td>
+                            <td class="text-start">{{ rec.time_code }}</td>
+                            <td>{{ rec.hours }}</td>
+                            <td>{{ rec.type_id }}</td>
+                            <td>{{ rec.fye|date:'m/d/Y' }}</td>
+                            <td>{{ rec.note }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    {% load humanize %}
+    <div class="container border">
+        <h4>{{ user.first_name }}'s Timesheet</h4>
+        <h5>Today: {{ today|date:'D m/d/Y' }}</h5>
+        <h5>Week: {{ week_beg|date:'D m/d/Y' }} - {{ week_end|date:'D m/d/Y' }}</h5>
+    </div>
+{% endblock %}
