@@ -2,19 +2,46 @@
 
 {% block content %}
     {% load humanize %}
-    <div class="container-fluid border mt-4">
-
+    <div class="container-fluid mt-4">
         <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-center">
-            <div class="col-6 border rounded-4 text-center">
-                <h2>{{ user.first_name }}'s Timesheet</h2>
-                <h3 class="fw-normal">Today: {{ today|date:'D m/d/Y' }}</h3>
-                <h3 class="fw-normal">Week: {{ week_beg|date:'D m/d/Y' }} - {{ week_end|date:'D m/d/Y' }}</h3>
+            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 rounded-4 text-center">
+                <h2 class="display-4 fw-normal">{{ user.first_name }}'s Timesheet</h2>
+                <h4 class="fw-normal">Today: {{ today|date:'D m/d/Y' }}</h4>
+                <h4 class="fw-normal">Week: {{ week_beg|date:'D m/d/Y' }} - {{ week_end|date:'D m/d/Y' }}</h4>
             </div>
         </div>
-        <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-between">
+        <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-between mt-4">
 
-            <div class="col-3 border rounded-4 pt-3">
-                <h4 class="text-center">Breakdown</h4>
+            <div class="col-xl-8 col-lg-8 col-md-12 col-sm-12 col-12 border rounded-2 pt-3">
+                <h4 class="text-center">Top Projects - Last 30 Days</h4>
+                <table class="table table-small text-light">
+                    <thead>
+                        <tr>
+                            <th>Provider</th>
+                            <th>Project</th>
+                            <th>FYE</th>
+                            <th>Hours</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for project in top_projects.all %}
+                            <tr>
+                                <td>{{ project.provider_id }} {{ project.provider_id__provider_name }}</td>
+                                <td>{{ project.time_code }} {{ project.time_code_id__time_code_description }}</td>
+                                <td>{{ project.fye|date:'m/d/Y' }}</td>
+                                <td>{{ project.sum_of_project_hours }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+
+            <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12 border rounded-2 pt-3">
+                <h4 class="text-center">Weekly Hours Total</h4>
+                <h1 class="display-1 text-center">{% if total_hours.sum_of_hours is None %}0.00{% else %}{{ total_hours.sum_of_hours }}{% endif %}</h1>
+
+                <h5 class="text-center">Breakdown</h5>
                 <table class="table table-small text-light">
                     <thead>
                         <tr>
@@ -44,80 +71,52 @@
                 </table>
             </div>
 
-            <div class="col-6 border rounded-4 pt-3">
-                <h4 class="text-center">Top Projects</h4>
-                <table class="table table-small text-light">
-                    <thead>
-                        <tr>
-                            <th>Provider</th>
-                            <th>Project</th>
-                            <th>FYE:</th>
-                            <th>Hours:</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for project in top_projects %}
-                            <tr>
-                                <td>{{ project.provider_id }} {{ project.get_providername }}</td>
-                                <td>{{ project.time_code }} {{ project.get_timcodedescription }}</td>
-                                <td>{{ project.fye|date:'m/d/Y' }}</td>
-                                <td>{{ project.sum_of_project_hours }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-
-            </div>
-
-            <div class="col-3 border rounded-4 pt-3">
-                <h4 class="text-center">Weekly Hours Total</h4>
-                <h1 class="display-1 text-center">{% if total_hours.sum_of_hours is None %}0.00{% else %}{{ total_hours.sum_of_hours }}{% endif %}</h1>
-            </div>
-
 
         </div>
 
-        <div class="row srg-bg-secondary rounded-4 mt-4 p-2 py-2">
+        <div class="row srg-bg-secondary rounded-4 mt-4 p-2 py-2 table-responsive">
+            <h4 class="text-center p-3 fw-semibold">Timesheet Form</h4>
             <form id="form-container" method="POST">
             {% csrf_token %}
-                <table class="table table-bordered">
+                <table class="table table-bordered fw-normal">
                     <thead>
-                        <tr class="text-center">
-                            <th>Date</th>
-                            <th>Provider</th>
-                            <th>Time Code</th>
-                            <th>Hours</th>
-                            <th>Type</th>
-                            <th>FYE</th>
-                            <th>Note</th>
+                        <tr class="text-center fw-normal">
+                            <th class="fw-semibold">Date</th>
+                            <th class="fw-semibold">Provider</th>
+                            <th class="fw-semibold">Time Code</th>
+                            <th class="fw-semibold">Hours</th>
+                            <th class="fw-semibold">Type</th>
+                            <th class="fw-semibold">FYE</th>
+                            <th class="fw-semibold">Note</th>
                         </tr>
                     </thead>
                     {{ timesheet_formset.management_form }}
                     {% for form in timesheet_formset %}
                         <tr class="timesheet-form">
                             {% for field in form.visible_fields %}
-                                <td>{{ field }}</td>
+                                <td class="py-1 text-center">{{ field }}</td>
                             {% endfor %}
                         </tr>
                     {% endfor %}
                 </table>
 
-                <button class="btn btn-primary" type="submit">Save Timesheet</button>
+                <button class="srg-btn-primary btn btn-primary" style="background-color: #7178A1;border: 1px solid #7178A1" type="submit">Save Timesheet</button>
             </form>
         </div>
 
 
-        <div class="row srg-bg-secondary rounded-4 mt-4">
+        <div class="row srg-bg-secondary rounded-4 my-4 p-2 py-2 table-responsive-md">
+            <h4 class="text-center p-3 fw-semibold">Current Week Timesheet</h4>
             <table class="table text-center table-bordered">
                 <thead>
                     <tr class="text-center">
-                        <th>Date</th>
-                        <th>Provider</th>
-                        <th>Time Code</th>
-                        <th>Hours</th>
-                        <th>Type</th>
-                        <th>FYE</th>
-                        <th>Note</th>
+                        <th class="fw-semibold">Date</th>
+                        <th class="fw-semibold">Provider</th>
+                        <th class="fw-semibold">Time Code</th>
+                        <th class="fw-semibold">Hours</th>
+                        <th class="fw-semibold">Type</th>
+                        <th class="fw-semibold">FYE</th>
+                        <th class="fw-semibold">Note</th>
                     </tr>
                 </thead>
                 <tbody>
