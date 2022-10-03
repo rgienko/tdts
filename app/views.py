@@ -34,9 +34,13 @@ def main(request):
     week_beg = today - timedelta(days=today.weekday())
     week_end = today + timedelta(days=5)
 
+    current_timesheet = TblTimeSheet.objects.filter(employee_id=request.user.username).filter(
+        date__lte=week_end).filter(date__gte=week_beg).order_by('date')
+
     context['today'] = today
     context['week_beg'] = week_beg
     context['week_end'] = week_end
+    context['current_timesheet'] = current_timesheet
 
     return render(request, 'index.html', context)
 

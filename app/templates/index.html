@@ -3,8 +3,44 @@
 {% block content %}
     {% load humanize %}
     <div class="container border">
-        <h4>{{ user.first_name }}'s Timesheet</h4>
-        <h5>Today: {{ today|date:'D m/d/Y' }}</h5>
-        <h5>Week: {{ week_beg|date:'D m/d/Y' }} - {{ week_end|date:'D m/d/Y' }}</h5>
+        <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-center">
+            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 rounded-4 text-center">
+                <h2 class="display-4 fw-normal">Welcome, {{ user.first_name }}</h2>
+                <h4 class="fw-normal">Today: {{ today|date:'D m/d/Y' }}</h4>
+                <h4 class="fw-normal">Week: {{ week_beg|date:'D m/d/Y' }} - {{ week_end|date:'D m/d/Y' }}</h4>
+            </div>
+        </div>
+
+
+        <div class="row srg-bg-secondary rounded-4 my-4 p-2 py-2 table-responsive-md">
+            <h4 class="text-center p-3 fw-semibold my-0">Current Week Timesheet</h4>
+            <a href="{% url 'timesheet' %}" class="link-dark d-flex justify-content-end">View Timesheeet</a>
+            <table class="table text-center table-bordered">
+                <thead>
+                    <tr class="text-center">
+                        <th class="fw-semibold">Date</th>
+                        <th class="fw-semibold">Provider</th>
+                        <th class="fw-semibold">Time Code</th>
+                        <th class="fw-semibold">Hours</th>
+                        <th class="fw-semibold">Type</th>
+                        <th class="fw-semibold">FYE</th>
+                        <th class="fw-semibold">Note</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rec in current_timesheet %}
+                        <tr>
+                            <td>{{ rec.date|date:'m/d/Y' }}</td>
+                            <td class="text-start">{{ rec.provider_id }}</td>
+                            <td class="text-start">{{ rec.time_code }}</td>
+                            <td>{{ rec.hours }}</td>
+                            <td>{{ rec.type_id }}</td>
+                            <td>{{ rec.fye|date:'m/d/Y' }}</td>
+                            <td>{{ rec.note }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 {% endblock %}
