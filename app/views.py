@@ -4,7 +4,6 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import auth, messages
 from django.db.models import Sum
-import pendulum
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
 from .forms import *
@@ -75,6 +74,7 @@ class TimesheetView(TemplateView):
 
         top_projects = TblTimeSheet.objects.values('provider_id', 'time_code', 'fye').filter(employee_id=self.request.user.username).filter(date__gte=self.thirty).annotate(sum_of_project_hours=Sum('hours')).order_by('-sum_of_project_hours')[:5]
 
+        print(self.today)
         return self.render_to_response({'timesheet_formset': formset, 'current_timesheet': current_timesheet,
                                         'today': self.today, 'week_beg': self.week_beg, 'week_end': self.week_end,
                                         'total_hours': total_hours, 'fixed_hours': fixed_hours,

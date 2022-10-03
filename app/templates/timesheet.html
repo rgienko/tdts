@@ -71,7 +71,7 @@
 
             <div class="col-3 border rounded-4 pt-3">
                 <h4 class="text-center">Weekly Hours Total</h4>
-                <h1 class="display-1 text-center">{{ total_hours.sum_of_hours }}</h1>
+                <h1 class="display-1 text-center">{% if total_hours.sum_of_hours is None %}0.00{% else %}{{ total_hours.sum_of_hours }}{% endif %}</h1>
             </div>
 
 
