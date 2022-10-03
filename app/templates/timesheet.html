@@ -3,24 +3,77 @@
 {% block content %}
     {% load humanize %}
     <div class="container-fluid border mt-4">
-        <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-between">
-            <div class="col-3 border rounded-4">
+
+        <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-center">
+            <div class="col-6 border rounded-4 text-center">
                 <h2>{{ user.first_name }}'s Timesheet</h2>
                 <h3 class="fw-normal">Today: {{ today|date:'D m/d/Y' }}</h3>
                 <h3 class="fw-normal">Week: {{ week_beg|date:'D m/d/Y' }} - {{ week_end|date:'D m/d/Y' }}</h3>
             </div>
+        </div>
+        <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-between">
+
+            <div class="col-3 border rounded-4 pt-3">
+                <h4 class="text-center">Breakdown</h4>
+                <table class="table table-small text-light">
+                    <thead>
+                        <tr>
+                            <th>Period</th>
+                            <th>Fixed</th>
+                            <th>Hourly</th>
+                            <th>Contin.</th>
+                            <th>NB</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Week</td>
+                            <td>{% if fixed_hours.sum_of_hours is None  %}{% else %}{{ fixed_hours.sum_of_hours }}{% endif %}</td>
+                            <td>{% if hourly_hours.sum_of_hours is None  %}{% else %}{{ hourly_hours.sum_of_hours }}{% endif %}</td>
+                            <td>{% if contingency_hours.sum_of_hours is None  %}{% else %}{{ contingency_hours.sum_of_hours }}{% endif %}</td>
+                            <td>{% if non_hours.sum_of_hours is None  %}{% else %}{{ non_hours.sum_of_hours }}{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <td>30 Days</td>
+                            <td>{% if thirty_fixed_hours.sum_of_hours is None  %}{% else %}{{ thirty_fixed_hours.sum_of_hours }}{% endif %}</td>
+                            <td>{% if thirty_hourly_hours.sum_of_hours is None  %}{% else %}{{ thirty_hourly_hours.sum_of_hours }}{% endif %}</td>
+                            <td>{% if thirty_contingency_hours.sum_of_hours is None  %}{% else %}{{ thirty_contingency_hours.sum_of_hours }}{% endif %}</td>
+                            <td>{% if thirty_non_hours.sum_of_hours is None  %}{% else %}{{ thirty_non_hours.sum_of_hours }}{% endif %}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="col-6 border rounded-4 pt-3">
+                <h4 class="text-center">Top Projects</h4>
+                <table class="table table-small text-light">
+                    <thead>
+                        <tr>
+                            <th>Provider</th>
+                            <th>Project</th>
+                            <th>FYE:</th>
+                            <th>Hours:</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for project in top_projects %}
+                            <tr>
+                                <td>{{ project.provider_id }} {{ project.get_providername }}</td>
+                                <td>{{ project.time_code }} {{ project.get_timcodedescription }}</td>
+                                <td>{{ project.fye|date:'m/d/Y' }}</td>
+                                <td>{{ project.sum_of_project_hours }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+
             <div class="col-3 border rounded-4 pt-3">
                 <h4 class="text-center">Weekly Hours Total</h4>
                 <h1 class="display-1 text-center">{{ total_hours.sum_of_hours }}</h1>
             </div>
 
-            <div class="col-3 border rounded-4">
-                <h5>Hours By Type:</h5>
-                <h4 class="fw-normal">Fixed-Fee: {{ fixed_hours.sum_of_hours }}</h4>
-                <h4 class="fw-normal">Hourly: {{ hourly_hours.sum_of_hours }}</h4>
-                <h4 class="fw-normal">Contingency: {{ contigency_hours.sum_of_hours }}</h4>
-                <h4 class="fw-normal">Non-Billable: {{ non_hours.sum_of_hours }}</h4>
-            </div>
 
         </div>
 
@@ -30,11 +83,10 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr class="text-center">
-                            <th>Employee</th>
                             <th>Date</th>
                             <th>Provider</th>
                             <th>Time Code</th>
-                            <th style="width:50px">Hours</th>
+                            <th>Hours</th>
                             <th>Type</th>
                             <th>FYE</th>
                             <th>Note</th>
@@ -59,7 +111,6 @@
             <table class="table text-center table-bordered">
                 <thead>
                     <tr class="text-center">
-                        <th>Employee</th>
                         <th>Date</th>
                         <th>Provider</th>
                         <th>Time Code</th>
@@ -72,7 +123,6 @@
                 <tbody>
                     {% for rec in current_timesheet %}
                         <tr>
-                            <td>{{ rec.employee_id }}</td>
                             <td>{{ rec.date|date:'m/d/Y' }}</td>
                             <td class="text-start">{{ rec.provider_id }}</td>
                             <td class="text-start">{{ rec.time_code }}</td>

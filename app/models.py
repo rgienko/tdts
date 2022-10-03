@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 # Create your models here.
@@ -70,4 +71,7 @@ class TblTimeSheet(models.Model):
 
     def get_timcodedescription(self):
         return self.time_code.time_code_description
+
+    def get_providername(self):
+        return self.provider_id.provider_name
 
