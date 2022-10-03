@@ -73,7 +73,7 @@ class TimesheetView(TemplateView):
         thirty_contingency_hours = thirty_timesheet.filter(type_id='C').aggregate(sum_of_hours=Sum('hours'))
         thirty_non_hours = thirty_timesheet.filter(type_id='N').aggregate(sum_of_hours=Sum('hours'))
 
-        top_projects = TblTimeSheet.objects.values('provider_id', 'time_code', 'fye').filter(employee_id=self.request.user.username).filter(date__gte=self.thirty).annotate(sum_of_project_hours=Sum('hours')).order_by('-sum_of_project_hours')[:5]
+        top_projects = thirty_timesheet.values('provider_id', 'provider_id__provider_name', 'time_code', 'fye', 'time_code_id__time_code_description').annotate(sum_of_project_hours=Sum('hours')).order_by('-sum_of_project_hours')[:5]
 
         return self.render_to_response({'timesheet_formset': formset, 'current_timesheet': current_timesheet,
                                         'today': self.today, 'week_beg': self.week_beg, 'week_end': self.week_end,

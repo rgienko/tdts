@@ -66,7 +66,7 @@ class TblTimeSheet(models.Model):
     time_code = models.ForeignKey(TblTimeCode, on_delete=models.CASCADE)
     hours = models.DecimalField(max_digits=4, decimal_places=2)
     type_id = models.ForeignKey(TblTypes, on_delete=models.CASCADE)
-    fye = models.DateField()
+    fye = models.DateField(null=True, blank=True)
     note = models.CharField(max_length=100, null=True, blank=True)
 
     def get_timcodedescription(self):
