@@ -1,10 +1,10 @@
-from datetime import date, timedelta
+from app.utils import Calendar
+from datetime import date, timedelta, datetime
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import auth, messages
-from django.db.models import Sum
-import pendulum
+from django.db.models import Sum, Count
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
 from .forms import *
@@ -45,6 +45,45 @@ def main(request):
     return render(request, 'index.html', context)
 
 
+def get_date(req_day):
+    if req_day:
+        year, month = (int(x) for x in req_day.split("-"))
+        return date(year, month, day=1)
+    return datetime.today()
+
+
+class ToDoListView(TemplateView):
+    template_name = 'todolist.html'
+
+    today = date.today()
+    thirty_date = today + timedelta(days=30)
+    thru_date = today + timedelta(days=60)
+    context = {'today': today, 'thru_date': thru_date}
+
+    def get(self, *args, **kwargs):
+        formset = ToDoListFormSet(queryset=TblToDoList.objects.none())
+
+        current_todolist = TblToDoList.objects.filter(employee_id=self.request.user.username).filter(
+            date__lte=self.thru_date).filter(date__gte=self.today).order_by('date')
+
+        upcoming_projects = current_todolist.values('date', 'provider_id', 'provider_id__provider_name', 'time_code',
+                                                    'time_code_id__time_code_description', 'fye').annotate()
+        print(upcoming_projects)
+        self.context['formset'] = formset
+        self.context['current_todolist'] = current_todolist
+        self.context['upcoming_projects'] = upcoming_projects
+        return self.render_to_response(self.context)
+
+    def post(self, *args, **kwargs):
+        formset = ToDoListFormSet(data=self.request.POST)
+        if formset.is_valid():
+            instances = formset.save(commit=False)
+            for instance in instances:
+                instance.employee_id = get_object_or_404(TblEmployee, pk=self.request.user.username)
+                instance.save()
+            return redirect(reverse_lazy('todolist'))
+
+
 class TimesheetView(TemplateView):
     template_name = 'timesheet.html'
 
@@ -77,7 +116,9 @@ class TimesheetView(TemplateView):
         thirty_contingency_hours = thirty_timesheet.filter(type_id='C').aggregate(sum_of_hours=Sum('hours'))
         thirty_non_hours = thirty_timesheet.filter(type_id='N').aggregate(sum_of_hours=Sum('hours'))
 
-        top_projects = thirty_timesheet.values('provider_id', 'provider_id__provider_name', 'time_code', 'fye', 'time_code_id__time_code_description').annotate(sum_of_project_hours=Sum('hours')).order_by('-sum_of_project_hours')[:5]
+        top_projects = thirty_timesheet.values('provider_id', 'provider_id__provider_name', 'time_code', 'fye',
+                                               'time_code_id__time_code_description').annotate(
+            sum_of_project_hours=Sum('hours')).order_by('-sum_of_project_hours')[:5]
 
         return self.render_to_response({'timesheet_formset': formset, 'current_timesheet': current_timesheet,
                                         'today': self.today, 'week_beg': self.week_beg, 'week_end': self.week_end,
@@ -92,7 +133,6 @@ class TimesheetView(TemplateView):
 
     def post(self, *args, **kwargs):
         formset = TimeSheetFormSet(data=self.request.POST)
-        print(get_object_or_404(TblEmployee, pk=self.request.user.username).employee_id)
 
         if formset.is_valid():
             instances = formset.save(commit=False)

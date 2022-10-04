@@ -21,5 +21,6 @@ urlpatterns = [
     path('', views.login, name='login'),
     path('main/', views.main, name='main'),
     path('main/timesheet/', views.TimesheetView.as_view(), name='timesheet'),
+    path('main/todolist/', views.ToDoListView.as_view(), name='todolist'),
     path('admin/', admin.site.urls),
 ]

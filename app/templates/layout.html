@@ -43,7 +43,7 @@
                         <a class="nav-link" aria-current="page" href="{% url 'timesheet' %}">My Timesheet</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">My To-Do List</a>
+                        <a class="nav-link" href="{% url 'todolist' %}">My To-Do List</a>
                     </li>
                 </ul>
                 {% if user.is_authenticated %}
