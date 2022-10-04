@@ -21,6 +21,11 @@ class TimeSheetAdmin(admin.ModelAdmin):
                     'type_id', 'fye', 'note')
 
 
+class TimeCodeAdmin(admin.ModelAdmin):
+    list_display = ('time_code', 'time_code_description')
+
+
 admin.site.register(TblProvider, ProviderAdmin)
 admin.site.register(TblTypes, TypesAdmin)
 admin.site.register(TblTimeSheet, TimeSheetAdmin)
+admin.site.register(TblTimeCode, TimeCodeAdmin)

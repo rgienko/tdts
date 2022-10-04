@@ -78,7 +78,7 @@
             <h4 class="text-center p-3 fw-semibold">Timesheet Form</h4>
             <form id="form-container" method="POST">
             {% csrf_token %}
-                <table class="table table-bordered fw-normal">
+                <table class="table table-bordered fw-normal table-sm">
                     <thead>
                         <tr class="text-center fw-normal">
                             <th class="fw-semibold">Date</th>
@@ -94,7 +94,7 @@
                     {% for form in timesheet_formset %}
                         <tr class="timesheet-form">
                             {% for field in form.visible_fields %}
-                                <td class="py-1 text-center">{{ field }}</td>
+                                <td class="text-center">{{ field }}</td>
                             {% endfor %}
                         </tr>
                     {% endfor %}
