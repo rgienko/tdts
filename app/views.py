@@ -1,12 +1,20 @@
-from app.utils import Calendar
 from datetime import date, timedelta, datetime
 
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import auth, messages
-from django.db.models import Sum, Count
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail, BadHeaderError
+from django.db.models import Sum
+from django.db.models.query_utils import Q
+from django.http import HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.template.loader import render_to_string
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView, UpdateView
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from django.views.generic import TemplateView
+
 from .forms import *
 from .models import *
 
@@ -27,6 +35,29 @@ def login(request):
     return render(request, 'login.html')
 
 
+def register(request):
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
+        username = first_name + "." + last_name
+        email = username + "@srgroupllc.com"
+        if password1 == password2:
+            new_user = User.objects.create_user(username, email, password1)
+            new_user.first_name = first_name
+            new_user.last_name = last_name
+            new_user.save()
+
+            return redirect('main')
+        else:
+            messages.error(request, 'Passwords do not match')
+    else:
+        pass
+
+    return render(request, 'register.html')
+
+
 @login_required
 def main(request):
     context = {}
@@ -45,6 +76,7 @@ def main(request):
     return render(request, 'index.html', context)
 
 
+@login_required()
 def get_date(req_day):
     if req_day:
         year, month = (int(x) for x in req_day.split("-"))
@@ -52,6 +84,7 @@ def get_date(req_day):
     return datetime.today()
 
 
+@login_required()
 def deleteToDoListEntry(request, pk):
     entry_instance = get_object_or_404(TblToDoList, pk=pk)
     if request.method == 'POST':
@@ -63,6 +96,7 @@ def deleteToDoListEntry(request, pk):
     return render(request, 'deltodolistentry.html', context)
 
 
+@login_required()
 def editToDoListEntry(request, pk):
     entry_instance = get_object_or_404(TblToDoList, pk=pk)
     context = {}
@@ -81,7 +115,6 @@ def editToDoListEntry(request, pk):
     context['entry_instance'] = entry_instance
 
     return render(request, 'editentry.html', context)
-
 
 
 class ToDoListView(TemplateView):
@@ -124,6 +157,7 @@ class ToDoListView(TemplateView):
         return redirect(reverse_lazy('todolist'))
 
 
+@login_required()
 def deleteToDoEntry(request, pk):
     entry_instance = get_object_or_404(TblToDoList, pk=pk)
     entry_instance.delete()
@@ -187,3 +221,33 @@ class TimesheetView(TemplateView):
             return redirect(reverse_lazy('timesheet'))
 
         return self.render_to_response({'timesheet_formset': formset})
+
+
+def password_reset_request(request):
+    if request.method == "POST":
+        password_reset_form = PasswordResetForm(request.POST)
+        if password_reset_form.is_valid():
+            data = password_reset_form.cleaned_data['email']
+            associated_users = User.objects.filter(Q(email=data))
+            if associated_users.exists():
+                for user in associated_users:
+                    subject = "Password Reset Requested"
+                    email_template_name = "password_reset_email.txt"
+                    c = {
+                        "email": user.email,
+                        'domain': '127.0.0.1:8000',
+                        'site_name': 'Website',
+                        "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+                        "user": user,
+                        'token': default_token_generator.make_token(user),
+                        'protocol': 'http',
+                    }
+                    email = render_to_string(email_template_name, c)
+                    try:
+                        send_mail(subject, email, 'randall.gienko@srgroupllc.com', [user.email], fail_silently=False)
+                    except BadHeaderError:
+                        return HttpResponse('Invalid header found.')
+                    return redirect("/password_reset/done/")
+    password_reset_form = PasswordResetForm()
+    return render(request=request, template_name="password_reset.html",
+                  context={"password_reset_form": password_reset_form})

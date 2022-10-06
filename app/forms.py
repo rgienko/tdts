@@ -1,8 +1,13 @@
-from django.forms import modelformset_factory
+from django.forms import modelformset_factory, PasswordInput
 from django import forms
+
+from . import widget
 from .models import *
 from .widget import *
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
 TimeSheetFormSet = modelformset_factory(TblTimeSheet,
                                         fields=(
@@ -37,3 +42,22 @@ class EditFormToDo(forms.ModelForm):
             'fye': _('FYE'),
             'note': _('Note')
         }
+
+
+class RegisterForm(forms.Form):
+    username = forms.CharField(help_text='First.Last ex: Randall.Gienko', required=True)
+    password1 = forms.CharField(widget=PasswordInput(), required=True)
+    password2 = forms.CharField(widget=PasswordInput(), required=True)
+    first_name = forms.CharField(required=True)
+    last_name = forms.CharField(required=True)
+    email = forms.EmailField(required=True)
+
+    # def clean(self):
+    #    cleaned_data = super().clean()
+    #    password1 = cleaned_data.get("password1")
+    #    password2 = cleaned_data.get("password2")
+
+    # if password1 != password2:
+    #   raise ValidationError(
+    #      "Passwords do not match."
+    # )
