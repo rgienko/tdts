@@ -80,9 +80,13 @@ class TblToDoList(models.Model):
     id = models.AutoField(primary_key=True)
     employee_id = models.ForeignKey(TblEmployee, on_delete=models.CASCADE)
     date = models.DateField()
+    end = models.DateField(null=True, blank=True)
     provider_id = models.ForeignKey(TblProvider, on_delete=models.CASCADE)
     time_code = models.ForeignKey(TblTimeCode, on_delete=models.CASCADE)
     # hours = models.DecimalField(max_digits=4, decimal_places=2)
     # type_id = models.ForeignKey(TblTypes, on_delete=models.CASCADE)
     fye = models.DateField(null=True, blank=True)
     note = models.CharField(max_length=100, null=True, blank=True)
+
+    def get_providername(self):
+        return self.provider_id.provider_name

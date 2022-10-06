@@ -1,4 +1,5 @@
 <!doctype html>
+{% load crispy_forms_tags %}
 <html lang="en">
     <head>
         <meta charset="utf-8">
@@ -15,6 +16,9 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
 
+        <link href='fullcalendar/main.css' rel='stylesheet' />
+        <script src='fullcalendar/main.js'></script>
+
             <!-- Favicons -->
         <link rel="apple-touch-icon" href="/docs/5.2/assets/img/favicons/apple-touch-icon.png" sizes="180x180">
         <link rel="icon" href="/docs/5.2/assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">
@@ -29,9 +33,11 @@
         <!-- Custom styles for this template -->
         {% load static %}
         <link rel="stylesheet" href="{% static 'css/site.css' %}">
+        <link href="{% static 'fullcalendar/main.css' %}" rel='stylesheet'/>
+        <script src="{% static 'fullcalendar/main.js' %}"></script>
     </head>
 <body>
-    <nav class="navbar navbar-expand-lg bg-light">
+    <nav class="navbar navbar-expand-lg bg-light sticky-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="{% url 'main' %}">App Name</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">

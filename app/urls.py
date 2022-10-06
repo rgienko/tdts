@@ -22,5 +22,7 @@ urlpatterns = [
     path('main/', views.main, name='main'),
     path('main/timesheet/', views.TimesheetView.as_view(), name='timesheet'),
     path('main/todolist/', views.ToDoListView.as_view(), name='todolist'),
+    path('main/todolist/delete/<pk>/', views.deleteToDoListEntry, name='deleteToDoListEntry'),
+    path('main/todolist/update/<pk>/', views.editToDoListEntry, name='editToDoListEntry'),
     path('admin/', admin.site.urls),
 ]

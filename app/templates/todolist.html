@@ -10,8 +10,8 @@
                 <h4 class="fw-normal">Thru: {{ thru_date|date:'D m/d/Y' }}</h4>
             </div>
         </div>
+        <!--
         <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-center mt-4">
-
             <div class="col-xl-8 col-lg-12 col-md-12 col-sm-12 col-12 border rounded-2 pt-3">
                 <h4 class="text-center">Upcoming Projects - Next 30 Days</h4>
                 <table class="table table-small text-light">
@@ -37,10 +37,8 @@
 
             </div>
 
-
-
         </div>
-
+        -->
         <div class="row srg-bg-secondary rounded-4 mt-4 p-2 py-2 table-responsive">
             <h4 class="text-center p-3 fw-semibold">To-Do List Form</h4>
             <form id="form-container" method="POST">
@@ -49,6 +47,7 @@
                     <thead>
                         <tr class="text-center fw-normal">
                             <th class="fw-semibold" style="width:150px">Date</th>
+                            <th class="fw-semibold" style="width:150px">End</th>
                             <th class="fw-semibold">Provider</th>
                             <th class="fw-semibold">Time Code</th>
                             <th class="fw-semibold" style="width:150px">FYE</th>
@@ -69,7 +68,7 @@
             </form>
         </div>
 
-
+        <!--
         <div class="row srg-bg-secondary rounded-4 my-4 p-2 py-2 table-responsive-md">
             <h4 class="text-center mt-2 fw-semibold">Current To-Do List</h4>
             <h5 class="text-center fw-semibold">Thru: {{ thru_date|date:'m/d/Y' }}</h5>
@@ -95,6 +94,65 @@
                     {% endfor %}
                 </tbody>
             </table>
+        </div>
+        -->
+        <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                aspectRatio: 2,
+                navLinks:true,
+                themeSystem:'bootstrap5',
+                headerToolbar: {
+                    left:'prev,next today',
+                    center:'title',
+                    right:'dayGridMonth,dayGridWeek'
+                },
+                initialView: 'dayGridMonth',
+                businessHours: true,
+                eventColor: '#7178A1',
+                events: [
+                  {% for item in todlist_items %}
+                  {
+                      title:'{{ item.title|safe }}',
+                      start: '{{ item.start|safe }}',
+                      end: '{{ item.end|safe }}'
+                  },
+                  {% endfor %}
+              ],
+                eventClick: function(info) {
+                    alert('Event: ' + info.event.title + info.event.id);
+                    //alert('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
+                    //alert('View: ' + info.view.type);
+
+                    // change the border color just for fun
+                    info.el.style.borderColor = 'red';
+                }
+            });
+            calendar.render();
+          });
+
+        </script>
+        <div class="row mb-4 srg-bg-secondary rounded-4 my-4 p-2 d-flex justify-content-between">
+            <div class="col-xl-4 border rounded-2 p-2">
+                <h3>To-Do List</h3>
+                <div class="col-xl-12 overflow-auto" style="max-height:650px">
+                {% for project in current_todolist %}
+                    <div class="card p-3 mt-2 srg-bg-primary text-white">
+                        <h4 class="fw-semibold">{{ project.provider_id }}</h4>
+                        <h6 class="">{{ project.time_code }} - FYE {{ project.fye|date:'m/d/Y' }}</h6>
+                        <p class="">Duration: {{ project.date|date:'m/d/Y' }} - {{ project.end|date:'m/d/Y' }}</p>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                              <a class="btn btn-primary me-md-2 px-4" style="background-color:#B4B8CD;border-color:#B4B8CD"  href="{% url 'editToDoListEntry' project.id %}" type="button">Edit</a>
+                              <a class="btn btn-danger px-3" type="button" href="{% url 'deleteToDoListEntry' project.id %}">Delete</a>
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+            </div>
+            <div class="col-xl-7 border rounded-2 p-2">
+                <div class="" id='calendar'></div>
+            </div>
         </div>
     </div>
 {% endblock %}

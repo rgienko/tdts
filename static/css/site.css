@@ -14,3 +14,13 @@
 .srg-btn-primary {
     background-color: #7178A1;
 }
+
+:root {
+    --fc-button-text-color: #fff;
+    --fc-button-bg-color: #7178A1;
+    --fc-button-border-color: #2C3E50;
+    --fc-button-hover-bg-color: #1e2b37;
+    --fc-button-hover-border-color: #1a252f;
+    --fc-button-active-bg-color: #1a252f;
+    --fc-button-active-border-color: #151e27;
+}

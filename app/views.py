@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import auth, messages
 from django.db.models import Sum, Count
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, UpdateView
 from .forms import *
 from .models import *
 
@@ -52,6 +52,38 @@ def get_date(req_day):
     return datetime.today()
 
 
+def deleteToDoListEntry(request, pk):
+    entry_instance = get_object_or_404(TblToDoList, pk=pk)
+    if request.method == 'POST':
+        entry_instance.delete()
+        return redirect('todolist')
+
+    context = {'entry_instance': entry_instance}
+
+    return render(request, 'deltodolistentry.html', context)
+
+
+def editToDoListEntry(request, pk):
+    entry_instance = get_object_or_404(TblToDoList, pk=pk)
+    context = {}
+    if request.method == 'POST':
+        form = EditFormToDo(request.POST, instance=entry_instance)
+
+        if form.is_valid():
+            entry_instance = form.save(commit=False)
+            entry_instance.save()
+
+            return redirect('todolist')
+    else:
+        form = EditFormToDo(instance=entry_instance)
+
+    context['form'] = form
+    context['entry_instance'] = entry_instance
+
+    return render(request, 'editentry.html', context)
+
+
+
 class ToDoListView(TemplateView):
     template_name = 'todolist.html'
 
@@ -68,10 +100,17 @@ class ToDoListView(TemplateView):
 
         upcoming_projects = current_todolist.values('date', 'provider_id', 'provider_id__provider_name', 'time_code',
                                                     'time_code_id__time_code_description', 'fye').annotate()
-        print(upcoming_projects)
+        todlist_items = []
+        for item in current_todolist:
+            todo_title = str(item.provider_id) + " " + str(item.time_code)
+            items_dict = {'title': todo_title, 'start': item.date, 'end': item.end + timedelta(days=1)}
+
+            todlist_items.append(items_dict)
+
         self.context['formset'] = formset
         self.context['current_todolist'] = current_todolist
         self.context['upcoming_projects'] = upcoming_projects
+        self.context['todlist_items'] = todlist_items
         return self.render_to_response(self.context)
 
     def post(self, *args, **kwargs):
@@ -82,6 +121,12 @@ class ToDoListView(TemplateView):
                 instance.employee_id = get_object_or_404(TblEmployee, pk=self.request.user.username)
                 instance.save()
             return redirect(reverse_lazy('todolist'))
+        return redirect(reverse_lazy('todolist'))
+
+
+def deleteToDoEntry(request, pk):
+    entry_instance = get_object_or_404(TblToDoList, pk=pk)
+    entry_instance.delete()
 
 
 class TimesheetView(TemplateView):
