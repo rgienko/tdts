@@ -16,11 +16,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from . import views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('', views.login, name='login'),
+    path('register/', views.register, name='register'),
     path('main/', views.main, name='main'),
     path('main/timesheet/', views.TimesheetView.as_view(), name='timesheet'),
     path('main/todolist/', views.ToDoListView.as_view(), name='todolist'),
+    path('main/todolist/delete/<pk>/', views.deleteToDoListEntry, name='deleteToDoListEntry'),
+    path('main/todolist/update/<pk>/', views.editToDoListEntry, name='editToDoListEntry'),
+    # path('accounts/', include('django.contrib.auth.urls')),
+    path('password_reset/', views.password_reset_request, name="password_reset"),
     path('admin/', admin.site.urls),
 ]

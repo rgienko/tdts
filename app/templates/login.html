@@ -1,60 +1,125 @@
 
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="generator" content="Hugo 0.101.0">
-    <title>Signin Template · Bootstrap v5.2</title>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="generator" content="Hugo 0.101.0">
+        <title>Signin Template · Bootstrap v5.2</title>
 
-    <link rel="canonical" href="https://getbootstrap.com/docs/5.2/examples/sign-in/">
-    <link href="/docs/5.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
-    <!-- CSS only -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
-    <!-- JavaScript Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+        <link rel="canonical" href="https://getbootstrap.com/docs/5.2/examples/sign-in/">
+        <link href="/docs/5.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+        <!-- CSS only -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+        <!-- JavaScript Bundle with Popper -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
 
-        <!-- Favicons -->
-    <link rel="apple-touch-icon" href="/docs/5.2/assets/img/favicons/apple-touch-icon.png" sizes="180x180">
-    <link rel="icon" href="/docs/5.2/assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">
-    <link rel="icon" href="/docs/5.2/assets/img/favicons/favicon-16x16.png" sizes="16x16" type="image/png">
-    <link rel="manifest" href="/docs/5.2/assets/img/favicons/manifest.json">
-    <link rel="mask-icon" href="/docs/5.2/assets/img/favicons/safari-pinned-tab.svg" color="#712cf9">
-    <link rel="icon" href="/docs/5.2/assets/img/favicons/favicon.ico">
-    <meta name="theme-color" content="#712cf9">
+            <!-- Favicons -->
+        <link rel="apple-touch-icon" href="/docs/5.2/assets/img/favicons/apple-touch-icon.png" sizes="180x180">
+        <link rel="icon" href="/docs/5.2/assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">
+        <link rel="icon" href="/docs/5.2/assets/img/favicons/favicon-16x16.png" sizes="16x16" type="image/png">
+        <link rel="manifest" href="/docs/5.2/assets/img/favicons/manifest.json">
+        <link rel="mask-icon" href="/docs/5.2/assets/img/favicons/safari-pinned-tab.svg" color="#712cf9">
+        <link rel="icon" href="/docs/5.2/assets/img/favicons/favicon.ico">
+        <meta name="theme-color" content="#712cf9">
+
+        <style>
+            .login-dark form .form-control {
+                background: none;
+                border: none;
+                border-bottom: 1px solid #ffffff;
+                border-radius: 0;
+                box-shadow: none;
+                outline: none;
+                color: #ffffff;
+            }
+
+            .login-dark form .btn-primary {
+                background: #B4B8CD;
+                border: none;
+                border-radius: 4px;
+                padding: 11px;
+                box-shadow: none;
+                margin-top: 26px;
+                text-shadow: none;
+                outline: none;
+            }
+
+            .login-dark form .btn-secondary:hover, .login-dark form .btn-secondary:active {
+                background: #A6B1ED;
+                outline: none;
+            }
+
+            .login-dark form .btn-secondary {
+                background: #A6B1ED;
+                border: none;
+                border-radius: 4px;
+                padding: 11px;
+                box-shadow: none;
+                margin-top: 26px;
+                text-shadow: none;
+                outline: none;
+            }
+
+            .login-dark form .btn-primary:hover, .login-dark form .btn-primary:active {
+                background: #A6B1ED;
+                outline: none;
+            }
 
 
+
+          .login-dark form .forgot {
+            display: block;
+            text-align: center;
+            font-size: 12px;
+            color: #6f7a85;
+            opacity: 0.9;
+            text-decoration: none;
+          }
+
+          .login-dark form .forgot:hover, .login-dark form .forgot:active {
+            opacity: 1;
+            text-decoration: none;
+          }
+
+          .login-dark form .btn-primary:active {
+            transform: translateY(1px);
+          }
+        </style>
     
     <!-- Custom styles for this template -->
-    <link href="css/signin.css" rel="stylesheet">
-  </head>
-  <body class="text-center">
-    
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'css/site.css' %}">
+    </head>
+    <body class="text-center srg-bg-secondary">
+
     <main class="form-signin vh-100 align-items-center d-flex justify-content-center">
-        <div class="card col-xl-3 p-5">
-            <form method="POST">
+        <div class="login-dark card col-xl-3 px-5 srg-bg-primary">
+            <form class="text-light" method="POST">
                 {% csrf_token %}
-                <i class="bi bi-lock-fill" style="font-size:4rem"></i>
-                <h1 class="h3 fw-normal">Please sign in</h1>
+                <i class="bi bi-lock-fill" style="font-size:6rem"></i>
+                <h1 class="h3 fw-normal"> Sign In</h1>
 
-                <div class="form-floating mt-5">
-                  <input type="text" class="form-control" id="floatingInput" placeholder="Username" name="username">
-                  <label for="floatingInput">Username</label>
+                <div class="form-floating mt-2 text-light">
+                    <input type="text" class="form-control" id="floatingInput" placeholder="Username" name="username">
+                    <label for="floatingInput">Username</label>
                 </div>
-                <div class="form-floating mt-2">
-                  <input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="password">
-                  <label for="floatingPassword">Password</label>
+                <div class="form-floating mt-2 text-light">
+                    <input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="password">
+                    <label for="floatingPassword">Password</label>
+
                 </div>
 
-                <button class="w-100 btn btn-lg btn-primary mt-5" type="submit">Sign in</button>
-                <p class="mt-5 mb-3 text-muted">&copy; 2017–2022</p>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-2">
+                    <button class="btn btn-primary" type="submit">Sign in</button>
+                    <a class="btn btn-secondary" href="{% url 'register' %}">Sign Up</a>
+                </div>
+
             </form>
+            <a class="my-4 form-text text-info text-decoration-none text-center" href="{% url 'password_reset' %}">Reset Password</a>
         </div>
-    </main>
-
-
-    
-  </body>
+        </main>
+    </body>
 </html>

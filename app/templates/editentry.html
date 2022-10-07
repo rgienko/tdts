@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="container-fluid p-0 overflow-visible">
+        <div class="row d-flex justify-content-center align-items-center srg-bg-secondary vh-100">
+            <div class="col-xl-5 srg-bg-secondary border card p-5">
+                <h5 class="display-6">Edit Entry:</h5>
+                <div class="card p-3 mt-2 srg-bg-primary text-white">
+                    <h4 class="fw-semibold">{{ entry_instance.provider_id }}</h4>
+                    <h6 class="">{{ entry_instance.time_code }} - FYE {{ entry_instance.fye|date:'m/d/Y' }}</h6>
+                    <p class="">Duration: {{ entry_instance.date|date:'m/d/Y' }} - {{ entry_instance.end|date:'m/d/Y' }}</p>
+                </div>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <form class="" action="" method="post">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <input type="submit" name="save" value="Save" class="btn btn-primary mt-2 px-4 me-2"/>
+                        <a class="btn btn-info mt-2 px-4" href="{% url 'todolist' %}">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock%}
