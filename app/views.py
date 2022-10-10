@@ -1,3 +1,4 @@
+import os
 from datetime import date, timedelta, datetime
 
 from django.contrib import auth, messages
@@ -14,6 +15,9 @@ from django.urls import reverse_lazy
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.views.generic import TemplateView
+
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 from .forms import *
 from .models import *
@@ -232,21 +236,41 @@ def password_reset_request(request):
             if associated_users.exists():
                 for user in associated_users:
                     subject = "Password Reset Requested"
+                    name = user.first_name
                     email_template_name = "password_reset_email.txt"
-                    c = {
-                        "email": user.email,
-                        'domain': '127.0.0.1:8000',
-                        'site_name': 'Website',
-                        "uid": urlsafe_base64_encode(force_bytes(user.pk)),
-                        "user": user,
-                        'token': default_token_generator.make_token(user),
-                        'protocol': 'http',
-                    }
-                    email = render_to_string(email_template_name, c)
+                    protocol = "http://"
+                    email = user.email
+                    domain = '127.0.0.1:8000/reset/'
+                    site_name = 'Website'
+                    uid = urlsafe_base64_encode(force_bytes(user.pk))
+                    user = user
+                    token = default_token_generator.make_token(user)
+
+                    reset_url = protocol + domain + uid + "/" + token
+
+                    message = Mail(
+                        from_email='Randall.Gienko@srgroupllc.com',
+                        to_emails='Randall.Gienko@srgroupllc.com',
+                        subject='Reset Password Request',
+                        html_content='Hello, '
+                                      + 'We received a request to reset the password for your account for this email '
+                                        'address. To initiate the password reset process for your account, '
+                                        'click the link: '
+                                      + reset_url
+                                      + ' This link can only be used once. If you need to reset your password again, '
+                                        'please request another reset. '
+                                      + 'If you did not make this request, you can simply ignore this email.'
+                                      + 'Sincerely,'
+                                      + 'The Website Team'
+                    )
                     try:
-                        send_mail(subject, email, 'randall.gienko@srgroupllc.com', [user.email], fail_silently=False)
-                    except BadHeaderError:
-                        return HttpResponse('Invalid header found.')
+                        sg = SendGridAPIClient('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')
+                        response = sg.send(message)
+                        print(response.status_code)
+                        print(response.body)
+                        print(response.headers)
+                    except Exception as e:
+                        print(e)
                     return redirect("/password_reset/done/")
     password_reset_form = PasswordResetForm()
     return render(request=request, template_name="password_reset.html",
