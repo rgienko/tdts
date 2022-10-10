@@ -264,7 +264,7 @@ def password_reset_request(request):
                                       + 'The Website Team'
                     )
                     try:
-                        sg = SendGridAPIClient('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')
+                        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
                         response = sg.send(message)
                         print(response.status_code)
                         print(response.body)
