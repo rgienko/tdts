@@ -1,7 +1,9 @@
 {% extends 'layout.html' %}
+{% load crispy_forms_filters %}
 
 {% block content %}
     {% load humanize %}
+    {% load crispy_forms_tags %}
     <div class="container-fluid mt-4">
         <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-center">
             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 rounded-4 text-center">
@@ -76,6 +78,8 @@
 
         <div class="row srg-bg-secondary rounded-4 mt-4 p-2 py-2 table-responsive">
             <h4 class="text-center p-3 fw-semibold">Timesheet Form</h4>
+
+
             <form id="form-container" method="POST">
             {% csrf_token %}
                 <table class="table table-bordered fw-normal table-sm">
@@ -107,7 +111,11 @@
 
         <div class="row srg-bg-secondary rounded-4 my-4 p-2 py-2 table-responsive-md">
             <h4 class="text-center p-3 fw-semibold">Current Week Timesheet</h4>
-            <table class="table text-center table-bordered">
+            <div class="col-xl-4 rounded-2 border">
+                {{ timesheet_formset|crispy }}
+            </div>
+            <div class="col-xl-8 rounded-2 border">
+                <table class="table text-center table-bordered">
                 <thead>
                     <tr class="text-center">
                         <th class="fw-semibold">Date</th>
@@ -133,6 +141,8 @@
                     {% endfor %}
                 </tbody>
             </table>
+            </div>
+
         </div>
     </div>
 {% endblock %}

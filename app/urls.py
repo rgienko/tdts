@@ -19,7 +19,7 @@ from . import views
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
-    path('', views.login, name='login'),
+    path('login/', views.login, name='login'),
     path('register/', views.register, name='register'),
     path('main/', views.main, name='main'),
     path('main/timesheet/', views.TimesheetView.as_view(), name='timesheet'),

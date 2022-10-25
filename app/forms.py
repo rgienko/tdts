@@ -13,7 +13,7 @@ TimeSheetFormSet = modelformset_factory(TblTimeSheet,
                                         fields=(
                                             "date", "provider_id", "time_code", "hours", "type_id",
                                             "fye", "note"),
-                                        extra=2, min_num=1,
+                                        extra=0, min_num=1,
                                         widgets={'date': DatePickerInput,
                                                  'hours': forms.NumberInput(attrs={'size': 5}),
                                                  'fye': DatePickerInput})
