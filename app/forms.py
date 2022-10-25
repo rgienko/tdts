@@ -1,4 +1,4 @@
-from django.forms import modelformset_factory, PasswordInput
+from django.forms import modelformset_factory, PasswordInput, ModelForm
 from django import forms
 
 from . import widget
@@ -13,7 +13,7 @@ TimeSheetFormSet = modelformset_factory(TblTimeSheet,
                                         fields=(
                                             "date", "provider_id", "time_code", "hours", "type_id",
                                             "fye", "note"),
-                                        extra=0, min_num=1,
+                                        extra=5, min_num=1,
                                         widgets={'date': DatePickerInput,
                                                  'hours': forms.NumberInput(attrs={'size': 5}),
                                                  'fye': DatePickerInput})
@@ -61,3 +61,25 @@ class RegisterForm(forms.Form):
     #   raise ValidationError(
     #      "Passwords do not match."
     # )
+
+
+class TimeSheetForm(forms.ModelForm):
+    class Meta:
+        model = TblTimeSheet
+
+        fields = ['date', 'provider_id', 'time_code', 'hours', 'type_id', 'fye', 'note']
+
+        labels = {
+            'date': _('Date'),
+            'provider_id': _('Provider'),
+            'time_code': _('Time Code'),
+            'hours': _('Hours'),
+            'type_id': _('Type'),
+            'fye': _('FYE'),
+            'note': _('Note')
+        }
+
+        widgets = {'date': DatePickerInput,
+                   'fye': DatePickerInput,
+                   'end': DatePickerInput,
+                   'note': forms.Textarea(attrs={'rows': 5, 'cols': 50})}

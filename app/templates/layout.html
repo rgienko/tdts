@@ -51,6 +51,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'todolist' %}">My To-Do List</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'analytics' %}">Analytics</a>
+                    </li>
                 </ul>
                 {% if user.is_authenticated %}
                     {{ user.first_name.0 }}{{ user.last_name.0}}
