@@ -1,0 +1,174 @@
+{% extends 'layout.html' %}
+{% load crispy_forms_filters %}
+
+{% block content %}
+    {% load humanize %}
+    {% load crispy_forms_tags %}
+    {% load static %}
+    <style>
+        .my-link:hover {
+            background-color: #A6B1ED
+        }
+
+    </style>
+
+    <link rel="stylesheet" href="{% static 'css/site.css' %}">
+    <div class="container-fluid mt-4">
+        <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-center">
+            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 rounded-4 text-center">
+                <h2 class="display-4 fw-normal">Projects Analysis
+                </h2>
+            </div>
+        </div>
+        <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-between mt-4">
+
+            <div class="col-xxl-8 col-xl-9 col-lg-8 col-md-12 col-sm-12 col-12 pt-3 px-3" id="tab-content" id="nav-tabContent" role="tablist">
+                <div class="row border-bottom">
+                    <div class="col-xxl-3 col-md-3 col-sm-3 text-center">
+                        Provider
+                    </div>
+                    <div class="col-xxl-4 col-md-4 col-sm-4 text-center">
+                        Project
+                    </div>
+
+                    <div class="col-xxl-2 col-md-2 col-sm-2 text-center">
+                        FYE
+                    </div>
+                    <div class="col-xxl-1 col-md-1 col-sm-1 text-center">
+                        Hours
+                    </div>
+                    <div class="col-xxl-1 col-md-1 col-sm-1 text-center">
+                        Budget
+                    </div>
+                    <div class="col-xxl-1 col-md-1 col-sm-1 text-center">
+                        %
+                    </div>
+                </div>
+                {% for project in top_projects %}
+                     <a class="my-link text-decoration-none link-light {% if forloop.counter == 1 %}active{% else %}{% endif %}" id="list-{{ project.provider_id }}-{{ project.time_code }}-{{ project.fye }}-list" data-bs-toggle="list"
+                        href="#list-{{ forloop.counter }}" role="tab" aria-controls="{{ project.provider_id }}-{{ project.time_code }}-{{ project.fye }}" >
+                        <div class="my-link row my-4 border rounded-4 py-2" >
+                            <div class="col-xxl-3 col-md-3 col-sm-3">
+                                {{ project.provider_id }} {{ project.provider_id__provider_name }}
+                            </div>
+                            <div class="col-xxl-4 col-md-4 col-sm-4">
+                                {{ project.time_code }} {{ project.time_code_id__time_code_description }}
+                            </div>
+
+                            <div class="col-xxl-2 col-md-2 col-sm-2 text-center">
+                                {{ project.fye|date:'m/d/Y' }}
+                            </div>
+                            <div class="col-xxl-1 col-md-1 col-sm-1 text-center">
+                                {{ project.sum_of_project_hours }}
+                            </div>
+                            <div class="col-xxl-1 col-md-1 col-sm-1 text-center">
+                                {{ project.time_code_id__time_code_hours_budget }}
+                            </div>
+                            <div class="col-xxl-1 col-md-1 col-sm-1 text-center">
+                                {{ project.percent_to_budget }}%
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+
+            <div class="col-xxl-4 col-xl-3 col-lg-4 col-md-4 col-sm-12 col-12">
+                <div class="tab-content" id="nav-tabContent">
+                    {% for project in top_projects %}
+                        <div class="tab-pane border rounded-2 pt-3 mt-md-2 {% if forloop.counter == 1 %}active{% else %}{% endif %}"
+                             id="list-{{ forloop.counter }}" role="tabpanel" aria-labelledby="list-{{ project.provider_id }}-{{ project.time_code }}-{{ project.fye }}-list">
+                            <h4 class="text-center">Quick Look</h4>
+                            <div class="pt-2 px-2">
+                                <h4>{{ project.provider_id }} - {{ project.provider_id__provider_name }}</h4>
+                                <h5>{{ project.time_code }} - {{ project.time_code_id__time_code_description }}</h5>
+                                <h5>{{ project.fye|date:'m/d/Y' }}</h5>
+                            </div>
+
+
+                            <div class="row mt-5">
+                                <div class="col-xxl-3 col-md-12 col-sm-3">
+                                    <h6 class="text-center mb-0">Hours Used</h6>
+                                    <h4 class="display-5 text-center">
+                                        {% if project.sum_of_project_hours is None %}
+                                            0.00
+                                        {% else %}
+                                            {{ project.sum_of_project_hours }}
+                                        {% endif %}
+                                    </h4>
+                                </div>
+                                <div class="col-xxl-3 col-md-12 col-sm-3">
+                                    <h6 class="text-center mb-0">Budget</h6>
+                                    <h4 class="display-5 text-center">
+                                        {% if project.time_code_id__time_code_hours_budget is None %}
+                                            0.00
+                                        {% else %}
+                                            {{ project.time_code_id__time_code_hours_budget }}
+                                        {% endif %}
+                                    </h4>
+                                </div>
+                                <div class="col-xxl-3 col-md-12 col-sm-3">
+                                    <h6 class="text-center mb-0">Available</h6>
+                                    <h4 class="display-5 text-center">
+                                        {% if project.hours_left is None %}
+                                            0.00
+                                        {% else %}
+                                            {% if project.hours_left >= 0 %}
+                                                {{ project.hours_left }}
+                                                {% else %}
+                                                    <span class="text-danger">{{ project.hours_left }}</span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </h4>
+                                </div>
+                                <div class="col-xxl-3 col-md-12 col-sm-3">
+                                    <h6 class="text-center mb-0">%</h6>
+                                    <h4 class="display-5 text-center">
+                                        {% if project.percent_to_budget is None %}
+                                            0.00
+                                        {% else %}
+                                            {% if project.hours_left >= 0 %}
+                                                {{ project.percent_to_budget }}%
+                                                {% else %}
+                                                    <span class="text-danger">{{ project.percent_to_budget }}</span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </h4>
+                                </div>
+                            </div>
+
+                            <div class="row mt-2 px-2">
+                                <div class="col-xxl-12">
+                                    <h5 class="text-center mt-4">Breakdown</h5>
+                                    <table class="table table-small text-light">
+                                        <thead>
+                                            <tr>
+                                                <th>Employee</th>
+                                                <th>Hours</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for e in project.proj_emp %}
+                                                <tr>
+                                                    <td>{{ e.employee_id }}</td>
+                                                    <td>{{ e.emp_sum_of_project_hours }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row mt-2 mb-4">
+                                <div class="col-xxl-12 text-center">
+                                    <a class="btn btn-outline-light py-2" href="#">Detailed Report</a>
+                                </div>
+                            </div>
+
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}

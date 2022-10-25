@@ -5,6 +5,7 @@ from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.tokens import default_token_generator
+from django.conf import settings
 from django.core.mail import send_mail, BadHeaderError
 from django.db.models import Sum
 from django.db.models.query_utils import Q
@@ -167,6 +168,33 @@ def deleteToDoEntry(request, pk):
     entry_instance.delete()
 
 
+class BulkTimeSheet(TemplateView):
+    template_name = 'bulktimesheet.html'
+
+    today = date.today()
+    week_beg = today - timedelta(days=today.weekday())
+    week_end = week_beg + timedelta(days=5)
+    thirty = date.today() - timedelta(days=30)
+
+    def get(self, *args, **kwargs):
+        formset = TimeSheetFormSet(queryset=TblTimeSheet.objects.none())
+
+        return self.render_to_response({'timesheet_formset': formset, 'today': self.today,
+                                        'week_beg': self.week_beg, 'week_end': self.week_end})
+
+    def post(self, *args, **kwargs):
+        formset = TimeSheetFormSet(data=self.request.POST)
+
+        if formset.is_valid():
+            instances = formset.save(commit=False)
+            for instance in instances:
+                instance.employee_id = get_object_or_404(TblEmployee, pk=self.request.user.username)
+                instance.save()
+            return redirect(reverse_lazy('timesheet'))
+
+        return self.render_to_response({'timesheet_formset': formset})
+
+
 class TimesheetView(TemplateView):
     template_name = 'timesheet.html'
 
@@ -179,7 +207,7 @@ class TimesheetView(TemplateView):
         # formset = TimeSheetFormSet(queryset=TblTimeSheet.objects.none(),
         #                          initial=[{'employee_id': self.request.user.username}])
 
-        formset = TimeSheetFormSet(queryset=TblTimeSheet.objects.none())
+        form = TimeSheetForm(self.request.POST)
 
         current_timesheet = TblTimeSheet.objects.filter(employee_id=self.request.user.username).filter(
             date__lte=self.week_end).filter(date__gte=self.week_beg).order_by('date')
@@ -203,7 +231,7 @@ class TimesheetView(TemplateView):
                                                'time_code_id__time_code_description').annotate(
             sum_of_project_hours=Sum('hours')).order_by('-sum_of_project_hours')[:5]
 
-        return self.render_to_response({'timesheet_formset': formset, 'current_timesheet': current_timesheet,
+        return self.render_to_response({'form': form, 'current_timesheet': current_timesheet,
                                         'today': self.today, 'week_beg': self.week_beg, 'week_end': self.week_end,
                                         'total_hours': total_hours, 'fixed_hours': fixed_hours,
                                         'hourly_hours': hourly_hours,
@@ -215,16 +243,74 @@ class TimesheetView(TemplateView):
                                         'top_projects': top_projects})
 
     def post(self, *args, **kwargs):
-        formset = TimeSheetFormSet(data=self.request.POST)
+        form = TimeSheetForm(self.request.POST)
 
-        if formset.is_valid():
-            instances = formset.save(commit=False)
-            for instance in instances:
-                instance.employee_id = get_object_or_404(TblEmployee, pk=self.request.user.username)
-                instance.save()
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.employee_id = get_object_or_404(TblEmployee, pk=self.request.user.username)
+            instance.save()
             return redirect(reverse_lazy('timesheet'))
 
-        return self.render_to_response({'timesheet_formset': formset})
+        return self.render_to_response({'form': form})
+
+
+@login_required()
+def editTimesheetEntry(request, pk):
+    entry_instance = get_object_or_404(TblTimeSheet, pk=pk)
+    context = {}
+    if request.method == 'POST':
+        form = TimeSheetForm(request.POST, instance=entry_instance)
+
+        if form.is_valid():
+            entry_instance = form.save(commit=False)
+            entry_instance.save()
+
+            return redirect('timesheet')
+    else:
+        form = TimeSheetForm(instance=entry_instance)
+
+    context['form'] = form
+    context['entry_instance'] = entry_instance
+
+    return render(request, 'edittimesheet.html', context)
+
+
+def analytics(request):
+    global proj_emp
+    today = date.today()
+
+    week_beg = today - timedelta(days=today.weekday())
+    week_end = week_beg + timedelta(days=5)
+    thirty = date.today() - timedelta(days=30)
+
+    thirty_timesheet = TblTimeSheet.objects.filter(
+        date__lte=week_end).filter(date__gte=thirty).order_by('date')
+
+    top_projects = thirty_timesheet.values('provider_id', 'provider_id__provider_name', 'time_code', 'fye',
+                                           'time_code_id__time_code_description',
+                                           'time_code_id__time_code_hours_budget').annotate(
+        sum_of_project_hours=Sum('hours')).order_by('-sum_of_project_hours')
+
+    all_projects = TblTimeSheet.objects.all()
+
+    labels = []
+    data = []
+    color = []
+
+    for item in top_projects:
+        proj_emp = TblTimeSheet.objects.filter(provider_id=item['provider_id'], time_code=item['time_code'],
+                                               fye=item['fye'])
+        proj_emp = proj_emp.values('employee_id', 'provider_id', 'time_code', 'fye',
+                                   'time_code_id__time_code_hours_budget').annotate(
+            emp_sum_of_project_hours=Sum('hours')).order_by('-emp_sum_of_project_hours')
+        item['proj_emp'] = proj_emp
+        item['hours_left'] = item['time_code_id__time_code_hours_budget'] - item['sum_of_project_hours']
+        item['percent_to_budget'] = round((item['sum_of_project_hours'] / item['time_code_id__time_code_hours_budget'] * 100))
+
+    context = {'today': today, 'top_projects': top_projects, 'all_projects': all_projects, 'labels': labels,
+               'data': data}
+
+    return render(request, 'analytics.html', context)
 
 
 def password_reset_request(request):
@@ -253,18 +339,18 @@ def password_reset_request(request):
                         to_emails='Randall.Gienko@srgroupllc.com',
                         subject='Reset Password Request',
                         html_content='Hello, '
-                                      + 'We received a request to reset the password for your account for this email '
-                                        'address. To initiate the password reset process for your account, '
-                                        'click the link: '
-                                      + reset_url
-                                      + ' This link can only be used once. If you need to reset your password again, '
-                                        'please request another reset. '
-                                      + 'If you did not make this request, you can simply ignore this email.'
-                                      + 'Sincerely,'
-                                      + 'The Website Team'
+                                     + 'We received a request to reset the password for your account for this email '
+                                       'address. To initiate the password reset process for your account, '
+                                       'click the link: '
+                                     + reset_url
+                                     + ' This link can only be used once. If you need to reset your password again, '
+                                       'please request another reset. '
+                                     + 'If you did not make this request, you can simply ignore this email.'
+                                     + 'Sincerely,'
+                                     + 'The Website Team'
                     )
                     try:
-                        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+                        sg = SendGridAPIClient(settings.SENDGRID_KEY)
                         response = sg.send(message)
                         print(response.status_code)
                         print(response.body)

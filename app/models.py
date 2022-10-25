@@ -53,6 +53,7 @@ class TblProvider(models.Model):
 class TblTimeCode(models.Model):
     time_code = models.IntegerField(primary_key=True)
     time_code_description = models.TextField(max_length=75)
+    time_code_hours_budget = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return str(self.time_code) + "-" + self.time_code_description
