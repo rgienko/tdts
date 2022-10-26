@@ -85,7 +85,7 @@
 
 
                             <div class="row mt-5">
-                                <div class="col-xxl-3 col-md-12 col-sm-3">
+                                <div class="col-xxl-4 col-md-12 col-sm-3">
                                     <h6 class="text-center mb-0">Hours Used</h6>
                                     <h4 class="display-5 text-center">
                                         {% if project.sum_of_project_hours is None %}
@@ -95,7 +95,7 @@
                                         {% endif %}
                                     </h4>
                                 </div>
-                                <div class="col-xxl-3 col-md-12 col-sm-3">
+                                <div class="col-xxl-4 col-md-12 col-sm-3">
                                     <h6 class="text-center mb-0">Budget</h6>
                                     <h4 class="display-5 text-center">
                                         {% if project.time_code_id__time_code_hours_budget is None %}
@@ -105,7 +105,7 @@
                                         {% endif %}
                                     </h4>
                                 </div>
-                                <div class="col-xxl-3 col-md-12 col-sm-3">
+                                <div class="col-xxl-4 col-md-12 col-sm-3">
                                     <h6 class="text-center mb-0">Available</h6>
                                     <h4 class="display-5 text-center">
                                         {% if project.hours_left is None %}
@@ -119,8 +119,8 @@
                                         {% endif %}
                                     </h4>
                                 </div>
-                                <div class="col-xxl-3 col-md-12 col-sm-3">
-                                    <h6 class="text-center mb-0">%</h6>
+                                <div class="col-xxl-12 col-md-12 col-sm-3 mt-3">
+                                    <h6 class="text-center mb-0">Budget Used</h6>
                                     <h4 class="display-5 text-center">
                                         {% if project.percent_to_budget is None %}
                                             0.00
@@ -158,7 +158,7 @@
                             </div>
                             <div class="row mt-2 mb-4">
                                 <div class="col-xxl-12 text-center">
-                                    <a class="btn btn-outline-light py-2" href="#">Detailed Report</a>
+                                    <a class="btn btn-outline-light py-2" href="{% url 'analytics-detail' project.provider_id project.time_code project.fye %}">Detailed Report</a>
                                 </div>
                             </div>
 

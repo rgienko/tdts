@@ -1,4 +1,5 @@
 import os
+import random
 from datetime import date, timedelta, datetime
 
 from django.contrib import auth, messages
@@ -275,8 +276,34 @@ def editTimesheetEntry(request, pk):
     return render(request, 'edittimesheet.html', context)
 
 
+def analytics_detail(request, prov, tc, fy):
+    proj_emp_detail = TblTimeSheet.objects.filter(provider_id=prov, time_code=tc, fye=fy)
+    proj_detail = proj_emp_detail[:1]
+
+    labels = []
+    data = []
+    color = []
+
+    proj_emp = proj_emp_detail.values('employee_id', 'provider_id', 'time_code', 'fye',
+                                      'time_code_id__time_code_hours_budget').annotate(
+        emp_sum_of_project_hours=Sum('hours')).order_by('-emp_sum_of_project_hours')
+
+    for e in proj_emp:
+        labels.append(e['employee_id'])
+        data.append(e['emp_sum_of_project_hours'])
+        color.append((random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)))
+    print(color)
+
+    context = {'proj_emp_detail': proj_emp_detail,
+               'proj_detail': proj_detail,
+               'labels': labels,
+               'data': data,
+               'color': color}
+
+    return render(request, 'analytics_detail.html', context)
+
+
 def analytics(request):
-    global proj_emp
     today = date.today()
 
     week_beg = today - timedelta(days=today.weekday())
@@ -305,7 +332,8 @@ def analytics(request):
             emp_sum_of_project_hours=Sum('hours')).order_by('-emp_sum_of_project_hours')
         item['proj_emp'] = proj_emp
         item['hours_left'] = item['time_code_id__time_code_hours_budget'] - item['sum_of_project_hours']
-        item['percent_to_budget'] = round((item['sum_of_project_hours'] / item['time_code_id__time_code_hours_budget'] * 100))
+        item['percent_to_budget'] = round(
+            (item['sum_of_project_hours'] / item['time_code_id__time_code_hours_budget'] * 100))
 
     context = {'today': today, 'top_projects': top_projects, 'all_projects': all_projects, 'labels': labels,
                'data': data}

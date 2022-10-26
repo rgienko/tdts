@@ -22,7 +22,7 @@ class TimeSheetAdmin(admin.ModelAdmin):
 
 
 class TimeCodeAdmin(admin.ModelAdmin):
-    list_display = ('time_code', 'time_code_description', 'time_code_hours_budget')
+    list_display = ('time_code', 'time_code_description')
 
 
 admin.site.register(TblProvider, ProviderAdmin)

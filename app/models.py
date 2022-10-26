@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 
 
 # Create your models here.
@@ -31,6 +32,9 @@ class TblEmployee(models.Model):
 
     def EmployeeEmail(self):
         return "%s@srgroupllc.com" % self.employee_id
+
+    def getRate(self):
+        return self.employee_title.rate
 
 
 class TblParent(models.Model):
@@ -75,6 +79,12 @@ class TblTimeSheet(models.Model):
 
     def get_providername(self):
         return self.provider_id.provider_name
+
+    def get_rate(self):
+        title = get_object_or_404(TblEmployee, pk=self.employee_id)
+        # emp_rate = get_object_or_404(TblEmployeeTitles, pk=title)
+        emp_rate = get_object_or_404(TblEmployeeTitles, pk=title.employee_title_id)
+        return emp_rate.rate
 
 
 class TblToDoList(models.Model):
