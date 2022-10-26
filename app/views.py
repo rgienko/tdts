@@ -276,6 +276,7 @@ def editTimesheetEntry(request, pk):
 
 
 def analytics(request):
+    global proj_emp
     today = date.today()
 
     week_beg = today - timedelta(days=today.weekday())
@@ -291,20 +292,23 @@ def analytics(request):
         sum_of_project_hours=Sum('hours')).order_by('-sum_of_project_hours')
 
     all_projects = TblTimeSheet.objects.all()
-    print(top_projects)
+
+    labels = []
+    data = []
+    color = []
 
     for item in top_projects:
         proj_emp = TblTimeSheet.objects.filter(provider_id=item['provider_id'], time_code=item['time_code'],
                                                fye=item['fye'])
         proj_emp = proj_emp.values('employee_id', 'provider_id', 'time_code', 'fye',
                                    'time_code_id__time_code_hours_budget').annotate(
-                                    emp_sum_of_project_hours=Sum('hours')).order_by('-emp_sum_of_project_hours')
+            emp_sum_of_project_hours=Sum('hours')).order_by('-emp_sum_of_project_hours')
         item['proj_emp'] = proj_emp
         item['hours_left'] = item['time_code_id__time_code_hours_budget'] - item['sum_of_project_hours']
+        item['percent_to_budget'] = round((item['sum_of_project_hours'] / item['time_code_id__time_code_hours_budget'] * 100))
 
-    print(top_projects)
-
-    context = {'today': today, 'top_projects': top_projects, 'all_projects': all_projects}
+    context = {'today': today, 'top_projects': top_projects, 'all_projects': all_projects, 'labels': labels,
+               'data': data}
 
     return render(request, 'analytics.html', context)
 
