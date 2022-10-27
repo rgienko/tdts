@@ -280,9 +280,19 @@ def analytics_detail(request, prov, tc, fy):
     proj_emp_detail = TblTimeSheet.objects.filter(provider_id=prov, time_code=tc, fye=fy)
     proj_detail = proj_emp_detail[:1]
 
+    proj_hours = proj_emp_detail.values('provider_id', 'provider_id__provider_name', 'time_code', 'fye',
+                                             'time_code_id__time_code_description',
+                                             'time_code_id__time_code_hours_budget').annotate(
+                                            sum_of_project_hours=Sum('hours')).order_by('-sum_of_project_hours')
+
     labels = []
     data = []
     color = []
+    proj_dollars = []
+
+    for h in proj_hours:
+        proj_dollars.append(h['sum_of_project_hours'] * 250)
+        proj_dollars.append(h['time_code_id__time_code_hours_budget'] * 250)
 
     proj_emp = proj_emp_detail.values('employee_id', 'provider_id', 'time_code', 'fye',
                                       'time_code_id__time_code_hours_budget').annotate(
@@ -291,14 +301,17 @@ def analytics_detail(request, prov, tc, fy):
     for e in proj_emp:
         labels.append(e['employee_id'])
         data.append(e['emp_sum_of_project_hours'])
+        # proj_dollars.append(e['time_code_id__time_code_hours_budget'] * 250)
         color.append((random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)))
-    print(color)
 
+    print(proj_dollars)
     context = {'proj_emp_detail': proj_emp_detail,
                'proj_detail': proj_detail,
                'labels': labels,
                'data': data,
-               'color': color}
+               'color': color,
+               'proj_dollars': proj_dollars,
+               'proj_hours': proj_hours}
 
     return render(request, 'analytics_detail.html', context)
 

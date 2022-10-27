@@ -86,6 +86,9 @@ class TblTimeSheet(models.Model):
         emp_rate = get_object_or_404(TblEmployeeTitles, pk=title.employee_title_id)
         return emp_rate.rate
 
+    def get_project_budget(self):
+        return self.time_code.time_code_hours_budget
+
 
 class TblToDoList(models.Model):
     id = models.AutoField(primary_key=True)

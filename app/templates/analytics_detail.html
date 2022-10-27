@@ -3,7 +3,7 @@
 {% block content %}
     {% load mathfilters %}
     <div class="container-fluid mt-4">
-        <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-center">
+        <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-center sticky-top">
             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 rounded-4 text-center border">
                 <h2 class="display-4 fw-normal">Project Analysis</h2>
                 {% for item in proj_detail %}
@@ -13,50 +13,145 @@
                 {% endfor %}
             </div>
         </div>
+        <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-xxl-between justify-content-sm-center mt-4">
+            <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6 border-lg rounded-2 py-4">
+                <h4 class="text-center">Hours by Employee</h4>
+                <canvas id="myChart" width="100" height="100"></canvas>
+                <script>
+                    const config = {
+                        type: 'doughnut',
+                        data: {
+                            labels:{{ labels|safe }},
+                            datasets: [{
+                                label: [{{ labels|safe }}],
+                                data: [{% for i in data %}{{ i }},{% endfor %}],
+                                backgroundColor: [{% for i in color %}'rgb{{ i|safe }}',{% endfor %}],
+                                borderColor: [{% for i in color %}'rgb{{ i|safe }}',{% endfor %}]
+                            }]
+                        },
+                        options: {
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        color: "white",
+                                    }
+                                }
+                            }
+                        }
+                    };
+                </script>
+            </div>
+            <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6 border-lg rounded-2 py-4">
+                <h4 class="text-center">Total Hours</h4>
+                <canvas id="myChart2" width="100" height="100"></canvas>
+                <script>
+                    const config2 = {
+                        type: 'doughnut',
+                        data: {
+                            labels:['Used', 'Available'],
+                            datasets: [{
+                                label: ['Used', 'Available'],
+                                data: [{% for i in proj_hours %}{{ i.sum_of_project_hours }},{{ i.time_code_id__time_code_hours_budget }}{% endfor %}],
+                                backgroundColor: ['#A6B1ED','#B4B8CD'],
+                                borderColor: ['#A6B1ED','#B4B8CD'],
+                            }]
+                        },
+                        options: {
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        color: "white"
+                                    }
+                                }
+                            }
+                        }
+                    };
 
-         <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-between mt-4">
+                </script>
+            </div>
+            <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6 border-lg rounded-2 py-4">
+                <h4 class="text-center">Total Cost</h4>
+                <canvas id="myChart3" width="100" height="100"></canvas>
+                <script>
+                    const config3 = {
+                        type: 'doughnut',
+                        data: {
+                            labels:['Cost', 'Budget'],
+                            datasets: [{
+                                label: ['Used', 'Available'],
+                                data: [{% for i in proj_dollars %}{{ i }},{% endfor %}],
+                                backgroundColor: ['#A6B1ED','#B4B8CD'],
+                                borderColor: ['#A6B1ED','#B4B8CD'],
+                            }]
+                        },
+                        options: {
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        color: "white"
+                                    }
+                                }
+                            }
+                        }
+                    };
+                    window.onload = function() {
 
-            <div class="col-xxl-8 col-xl-9 col-lg-8 col-md-12 col-sm-12 col-12 pt-3 px-3">
-                <div class="row border-bottom">
-                    <div class="col-xxl-3 col-md-3 col-sm-3 text-center">
+                        const ctx = document.getElementById('myChart').getContext('2d');
+                        window.myLine = new Chart(ctx, config);
+
+                        const ctx2 = document.getElementById('myChart2').getContext('2d');
+                        window.myLine = new Chart(ctx2, config2);
+
+                        const ctx3 = document.getElementById('myChart3').getContext('2d');
+                        window.myLine = new Chart(ctx3, config3);
+                    }
+                </script>
+
+            </div>
+        </div>
+
+         <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-center mt-4">
+
+            <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 pt-3 px-3">
+                <div class="row border-bottom d-flex justify-content-evenly">
+                    <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3 text-center">
                         Employee
                     </div>
-                    <div class="col-xxl-2 col-md-4 col-sm-4 text-center">
+                    <div class="col-xxl-2 col-xl-2 col-lg-2 col-md-2 col-sm-2 text-center">
                         Date
                     </div>
-                    <div class="col-xxl-1 col-md-1 col-sm-1 text-center">
+                    <div class="col-xxl-1 col-xl-1 col-lg-1 col-md-2 col-sm-1 text-center">
                         Hours
                     </div>
-                    <div class="col-xxl-1 col-md-1 col-sm-1 text-center">
+                    <div class="col-xxl-1 col-xl-1 col-lg-1 col-md-2 col-sm-1 text-center">
                         Rate
                     </div>
-                    <div class="col-xxl-1 col-md-1 col-sm-1 text-center">
+                    <div class="col-xxl-1 col-xl-1 col-lg-1 col-md-2 col-sm-1  text-center">
                         Cost
                     </div>
                 </div>
                 {% for emp in proj_emp_detail %}
-                     <div class="my-link row my-4 border rounded-4 py-2" >
-                        <div class="col-xxl-3 col-md-3 col-sm-3 text-center border">
+                     <div class="my-link row my-4 border rounded-4 py-2 d-flex justify-content-evenly" >
+                        <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3 text-center">
                             {{ emp.employee_id }}
                         </div>
-                        <div class="col-xxl-2 col-md-4 col-sm-4 text-center">
+                        <div class="col-xxl-2 col-xl-2 col-lg-2 col-md-2 col-sm-2 text-center">
                             {{ emp.date|date:'m/d/Y' }}
                         </div>
-                        <div class="col-xxl-1 col-md-2 col-sm-2 text-center">
+                        <div class="col-xxl-1 col-xl-1 col-lg-1 col-md-2 col-sm-1 text-center">
                             {{ emp.hours }}
                         </div>
-                        <div class="col-xxl-1 col-md-2 col-sm-2 text-center">
+                        <div class="col-xxl-1 col-xl-1 col-lg-1 col-md-2 col-sm-1 text-center">
                             {{ emp.get_rate }}
                         </div>
-                        <div class="col-xxl-1 col-md-2 col-sm-2 text-center">
+                        <div class="col-xxl-1 col-xl-1 col-lg-1 col-md-2 col-sm-1 text-center">
                             {{ emp.hours|mul:emp.get_rate|intcomma }}
                         </div>
                      </div>
                 {% endfor %}
-            </div>
-
-            <div class="col-xxl-4 col-xl-3 col-lg-4 col-md-12 col-sm-12 col-12 pt-3 px-3">
-                <canvas id="myChart" width="100" height="100"></canvas>
             </div>
 
          </div>
@@ -64,34 +159,5 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <script src="https://cdn.jsdelivr.net/combine/npm/chart.js@3.9.1,npm/chart.js@3.9.1/dist/chart.min.js"></script>
-    <canvas id="myChart" width="100" height="100"></canvas>
-    <script>
-        const config = {
-            type: 'doughnut',
-            data: {
-                labels:{{ labels|safe }},
-                datasets: [{
-                    label: [{{ labels|safe }}],
-                    data: [{% for i in data %}{{ i }},{% endfor %}],
-                    backgroundColor: [{% for i in color %}'rgb{{ i|safe }}'{% endfor %}],
-                    borderColor: [{% for i in color %}'rgb{{ i|safe }}'{% endfor %}]
-                }]
-            },
-            options: {
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: "white"
-                        }
-                    }
-                }
-            }
-        };
 
-        window.onload = function() {
-        const ctx = document.getElementById('myChart').getContext('2d');
-        window.myLine = new Chart(ctx, config);
-        }
-
-    </script>
 {% endblock %}
