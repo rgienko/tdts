@@ -19,12 +19,11 @@ TimeSheetFormSet = modelformset_factory(TblTimeSheet,
                                                  'fye': DatePickerInput})
 
 ToDoListFormSet = modelformset_factory(TblToDoList,
-                                       fields=("date", "end", "provider_id", "time_code", "fye", "note"),
-                                       extra=2, min_num=1,
+                                       fields=("date", "provider_id", "time_code", "fye"),
+                                       extra=5, min_num=1,
                                        widgets={'date': DatePickerInput,
-                                                'fye': DatePickerInput,
-                                                'end': DatePickerInput,
-                                                'note': forms.TextInput(attrs={'size': 50})})
+                                                'fye': DatePickerInput})
+                                                # 'note': forms.TextInput(attrs={'size': 50})})
 
 
 class EditFormToDo(forms.ModelForm):
@@ -79,7 +78,28 @@ class TimeSheetForm(forms.ModelForm):
             'note': _('Note')
         }
 
-        widgets = {'date': DatePickerInput,
-                   'fye': DatePickerInput,
-                   'end': DatePickerInput,
-                   'note': forms.Textarea(attrs={'rows': 5, 'cols': 50})}
+        widgets = {
+            'date': DatePickerInput,
+            'fye': DatePickerInput,
+            'end': DatePickerInput,
+            'note': forms.Textarea(attrs={'rows': 5, 'cols': 50})
+        }
+
+
+class ToDoForm(forms.ModelForm):
+    class Meta:
+        model = TblToDoList
+
+        fields = ['date', 'provider_id', 'time_code', 'fye']
+
+        labels = {
+            'date': _('Date'),
+            'provider_id': _('Provider'),
+            'time_code': _('Time Code'),
+            'fye': _('Fye')
+        }
+
+        widgets = {
+            'date': DatePickerInput,
+            'fye': DatePickerInput
+        }

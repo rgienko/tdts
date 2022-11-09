@@ -89,6 +89,9 @@ class TblTimeSheet(models.Model):
     def get_project_budget(self):
         return self.time_code.time_code_hours_budget
 
+    class Meta:
+        default_permissions = ('view', 'add', 'delete', 'change')
+
 
 class TblToDoList(models.Model):
     id = models.AutoField(primary_key=True)

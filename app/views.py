@@ -5,6 +5,7 @@ from datetime import date, timedelta, datetime
 from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
 from django.core.mail import send_mail, BadHeaderError
@@ -123,7 +124,9 @@ def editToDoListEntry(request, pk):
     return render(request, 'editentry.html', context)
 
 
-class ToDoListView(TemplateView):
+class ToDoListView(PermissionRequiredMixin,TemplateView):
+    permission_required = ('app.view_tbltodolist', 'app.add_tbltodolist',
+                           'app.change_tbltodolist', 'app.delete_tbltodolist')
     template_name = 'todolist.html'
 
     today = date.today()
@@ -132,8 +135,9 @@ class ToDoListView(TemplateView):
     context = {'today': today, 'thru_date': thru_date}
 
     def get(self, *args, **kwargs):
-        formset = ToDoListFormSet(queryset=TblToDoList.objects.none())
+        # formset = ToDoListFormSet(queryset=TblToDoList.objects.none())
 
+        form = ToDoForm(self.request.POST)
         current_todolist = TblToDoList.objects.filter(employee_id=self.request.user.username).filter(
             date__lte=self.thru_date).filter(date__gte=self.today).order_by('date')
 
@@ -142,31 +146,58 @@ class ToDoListView(TemplateView):
         todlist_items = []
         for item in current_todolist:
             todo_title = str(item.provider_id) + " " + str(item.time_code)
-            items_dict = {'title': todo_title, 'start': item.date, 'end': item.end + timedelta(days=1)}
+            items_dict = {'title': todo_title, 'start': item.date}
 
             todlist_items.append(items_dict)
 
-        self.context['formset'] = formset
+        self.context['form'] = form
         self.context['current_todolist'] = current_todolist
         self.context['upcoming_projects'] = upcoming_projects
         self.context['todlist_items'] = todlist_items
         return self.render_to_response(self.context)
 
     def post(self, *args, **kwargs):
-        formset = ToDoListFormSet(data=self.request.POST)
-        if formset.is_valid():
-            instances = formset.save(commit=False)
-            for instance in instances:
-                instance.employee_id = get_object_or_404(TblEmployee, pk=self.request.user.username)
-                instance.save()
+        form = ToDoForm(self.request.POST)
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.employee_id = get_object_or_404(TblEmployee, pk=self.request.user.username)
+            instance.save()
             return redirect(reverse_lazy('todolist'))
-        return redirect(reverse_lazy('todolist'))
+
+        return self.render_to_response({'form': form})
 
 
 @login_required()
 def deleteToDoEntry(request, pk):
     entry_instance = get_object_or_404(TblToDoList, pk=pk)
     entry_instance.delete()
+
+
+class BulkToDoList(TemplateView):
+    template_name = 'bulktodolist.html'
+
+    today = date.today()
+    thirty_date = today + timedelta(days=30)
+    thru_date = today + timedelta(days=60)
+    context = {'today': today, 'thru_date': thru_date}
+
+    def get(self, *args, **kwargs):
+        formset = ToDoListFormSet(queryset=TblToDoList.objects.none())
+        self.context['formset'] = formset
+
+        return self.render_to_response(self.context)
+
+    def post(self, *args, **kwargs):
+        formset = ToDoListFormSet(data=self.request.POST)
+
+        if formset.is_valid():
+            instances = formset.save(commit=False)
+            for instance in instances:
+                instance.employee_id = get_object_or_404(TblEmployee, pk=self.request.user.username)
+                instance.save()
+            return redirect(reverse_lazy('todolist'))
+
+        return self.render_to_response({'formset': formset})
 
 
 class BulkTimeSheet(TemplateView):
@@ -196,7 +227,9 @@ class BulkTimeSheet(TemplateView):
         return self.render_to_response({'timesheet_formset': formset})
 
 
-class TimesheetView(TemplateView):
+class TimesheetView(PermissionRequiredMixin, TemplateView):
+    permission_required = ('app.view_tbltimesheet', 'app.add_tbltimesheet',
+                           'app.change_tbltimesheet', 'app.delete_tbltimesheet')
     template_name = 'timesheet.html'
 
     today = date.today()

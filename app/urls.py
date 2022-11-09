@@ -28,6 +28,7 @@ urlpatterns = [
     path('main/todolist/', views.ToDoListView.as_view(), name='todolist'),
     path('main/todolist/delete/<pk>/', views.deleteToDoListEntry, name='deleteToDoListEntry'),
     path('main/todolist/update/<pk>/', views.editToDoListEntry, name='editToDoListEntry'),
+    path('main/todolist/bulk/', views.BulkToDoList.as_view(), name='todolist-bulk'),
     path('analytics/', views.analytics, name='analytics'),
     path('analytics/detail/<prov>/<tc>/<fy>/', views.analytics_detail, name='analytics-detail'),
     # path('accounts/', include('django.contrib.auth.urls')),

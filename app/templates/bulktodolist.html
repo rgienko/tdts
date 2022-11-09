@@ -1,0 +1,72 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    {% load humanize %}
+    <div class="container-fluid mt-4">
+        <div class="container">
+            <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-center">
+                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 rounded-4 text-center">
+                    <h2 class="display-4 fw-normal">{{ user.first_name }}'s To-Do List</h2>
+                    <h4 class="fw-normal">Today: {{ today|date:'D m/d/Y' }}</h4>
+                    <h4 class="fw-normal">Thru: {{ thru_date|date:'D m/d/Y' }}</h4>
+                </div>
+            </div>
+
+            <div class="row srg-bg-secondary rounded-4 mt-4 p-2 py-2 table-responsive">
+                <h4 class="text-center p-3 fw-semibold">To-Do List Form</h4>
+                <form id="form-container" method="POST">
+                {% csrf_token %}
+                    <table class="table table-bordered fw-normal table-sm">
+                        <thead>
+                            <tr class="text-center fw-normal">
+                                <th class="fw-semibold" style="width:150px">Date</th>
+                                <th class="fw-semibold">Provider</th>
+                                <th class="fw-semibold">Time Code</th>
+                                <th class="fw-semibold" style="width:150px">FYE</th>
+                            </tr>
+                        </thead>
+                        {{ formset.management_form }}
+                        {% for form in formset %}
+                            <tr class="todolist-form">
+                                {% for field in form.visible_fields %}
+                                    <td class="text-start text-center">{{ field }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </table>
+
+                    <button class="srg-btn-primary btn btn-primary" style="background-color: #7178A1;border: 1px solid #7178A1" type="submit">Save Entries</button>
+                </form>
+            </div>
+
+
+            <div class="row srg-bg-secondary rounded-4 my-4 p-2 py-2 table-responsive-md">
+                <h4 class="text-center mt-2 fw-semibold">Current To-Do List</h4>
+                <h5 class="text-center fw-semibold">Thru: {{ thru_date|date:'m/d/Y' }}</h5>
+                <table class="table text-center table-bordered mt-2">
+                    <thead>
+                        <tr class="text-center fw-normal">
+                            <th class="fw-semibold" style="width:150px">Date</th>
+                            <th class="fw-semibold">Provider</th>
+                            <th class="fw-semibold">Time Code</th>
+                            <th class="fw-semibold">FYE</th>
+                            <th class="fw-semibold">Note</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rec in current_todolist %}
+                            <tr>
+                                <td>{{ rec.date|date:'m/d/Y' }}</td>
+                                <td class="text-start">{{ rec.provider_id }}</td>
+                                <td class="text-start">{{ rec.time_code }}</td>
+                                <td class="text-start">{{ rec.fye|date:'m/d/Y' }}</td>
+                                <td>{{ rec.note }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
