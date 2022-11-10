@@ -31,6 +31,7 @@ urlpatterns = [
     path('main/todolist/bulk/', views.BulkToDoList.as_view(), name='todolist-bulk'),
     path('analytics/', views.analytics, name='analytics'),
     path('analytics/detail/<prov>/<tc>/<fy>/', views.analytics_detail, name='analytics-detail'),
+    path('comparison/', views.comparison, name='comparison'),
     # path('accounts/', include('django.contrib.auth.urls')),
     path('password_reset/', views.password_reset_request, name="password_reset"),
     path('admin/', admin.site.urls),

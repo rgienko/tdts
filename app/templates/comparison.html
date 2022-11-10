@@ -1,0 +1,103 @@
+{% extends 'layout.html' %}
+{% load crispy_forms_filters %}
+
+{% block content %}
+    {% load humanize %}
+    {% load crispy_forms_tags %}
+    {% load mathfilters %}
+    {% load static %}
+    <style>
+        .my-link:hover {
+            background-color: #A6B1ED
+        }
+
+    </style>
+
+    <link rel="stylesheet" href="{% static 'css/site.css' %}">
+    <div class="container-fluid mt-4">
+        <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-center">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 rounded-4 text-start">
+                <h3 class="display-5 fw-normal">Comparison Report</h3>
+                <h4 class="display-6 fw-normal">Employee: {{ user }}</h4>
+                <div class=" py-2">
+                    <form method="get">
+                        {% csrf_token %}
+                            <div class="card px-5 border-0 srg-bg-primary">
+                                <h5>Filter</h5>
+                                {{ timesheet_filter.form.as_table }}
+                            <button type="submit" class="mt-2 btn btn-primary w-25" id="filter">Filter</button>
+                        </div>
+                    </form>
+
+
+                </div>
+
+                 <table class="table">
+                    <thead>
+                        <tr class="text-white">
+                            <th class="">Employee</th>
+                            <th class="">Provider</th>
+                            <th class="">Project</th>
+                            <th class="">FYE</th>
+                            <th class="">TS HRS</th>
+                            <th class="">TD HRS</th>
+                            <th class="">ACC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in timesheet_filter.qs %}
+                            <tr class="text-white">
+                                <td>{{ entry.employee_id }}</td>
+                                <td>{{ entry.provider_id }}-{{ entry.provider_id__provider_name }}</td>
+                                <td>{{ entry.time_code }}-{{ entry.time_code_id__time_code_description }}</td>
+                                <td>{{ entry.fye|date:'m/d/Y' }}</td>
+                                <td>{{ entry.sum_of_project_hours }}</td>
+                                <td>{{ entry.todo_hours }}</td>
+                                <td>{{ entry.accuracy }}%</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+
+        </div>
+        <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-between mt-4">
+            <div class="col-10 border rounded-2">
+                <table class="table">
+                    <thead>
+                        <tr class="text-white">
+                            <th class="">Provider</th>
+                            <th class="">Project</th>
+                            <th class="">FYE</th>
+                            <th class="">TS HRS</th>
+                            <th class="">TD HRS</th>
+                            <th class="">ACC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in employee_timesheet_projects %}
+                            <tr class="text-white">
+                                <td>{{ entry.provider_id }}-{{ entry.provider_id__provider_name }}</td>
+                                <td>{{ entry.time_code }}-{{ entry.time_code_id__time_code_description }}</td>
+                                <td>{{ entry.fye|date:'m/d/Y' }}</td>
+                                <td>{{ entry.sum_of_project_hours }}</td>
+                                <td>{{ entry.todo_hours }}</td>
+                                <td>{{ entry.accuracy }}%</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-4 border rounded-2">
+                <h4 class="display-6 fw-normal text-center">To-Do</h4>
+                {% for entry in employee_todolist_projects %}
+                    <p>{{ entry.provider_id }}-{{ entry.provider_id__provider_name }} {{ entry.time_code }} {{ entry.fye|date:'m/d/Y' }} {{ entry.count_of_project }} {{ entry.count_of_project|mul:8 }}</p>
+                {% endfor %}
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock %}

@@ -9,7 +9,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
 from django.core.mail import send_mail, BadHeaderError
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from django.db.models.query_utils import Q
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -18,10 +18,12 @@ from django.urls import reverse_lazy
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.views.generic import TemplateView
+from itertools import chain
 
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
+from .filters import TimeSheetFilter
 from .forms import *
 from .models import *
 
@@ -124,7 +126,7 @@ def editToDoListEntry(request, pk):
     return render(request, 'editentry.html', context)
 
 
-class ToDoListView(PermissionRequiredMixin,TemplateView):
+class ToDoListView(PermissionRequiredMixin, TemplateView):
     permission_required = ('app.view_tbltodolist', 'app.add_tbltodolist',
                            'app.change_tbltodolist', 'app.delete_tbltodolist')
     template_name = 'todolist.html'
@@ -314,9 +316,9 @@ def analytics_detail(request, prov, tc, fy):
     proj_detail = proj_emp_detail[:1]
 
     proj_hours = proj_emp_detail.values('provider_id', 'provider_id__provider_name', 'time_code', 'fye',
-                                             'time_code_id__time_code_description',
-                                             'time_code_id__time_code_hours_budget').annotate(
-                                            sum_of_project_hours=Sum('hours')).order_by('-sum_of_project_hours')
+                                        'time_code_id__time_code_description',
+                                        'time_code_id__time_code_hours_budget').annotate(
+        sum_of_project_hours=Sum('hours')).order_by('-sum_of_project_hours')
 
     labels = []
     data = []
@@ -325,7 +327,7 @@ def analytics_detail(request, prov, tc, fy):
 
     for h in proj_hours:
         proj_dollars.append(h['sum_of_project_hours'] * 250)
-        proj_dollars.append(h['time_code_id__time_code_hours_budget'] * 250)
+        proj_dollars.append((h['time_code_id__time_code_hours_budget'] - h['sum_of_project_hours']) * 250)
 
     proj_emp = proj_emp_detail.values('employee_id', 'provider_id', 'time_code', 'fye',
                                       'time_code_id__time_code_hours_budget').annotate(
@@ -337,7 +339,7 @@ def analytics_detail(request, prov, tc, fy):
         # proj_dollars.append(e['time_code_id__time_code_hours_budget'] * 250)
         color.append((random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)))
 
-    print(proj_dollars)
+    print(proj_hours)
     context = {'proj_emp_detail': proj_emp_detail,
                'proj_detail': proj_detail,
                'labels': labels,
@@ -385,6 +387,50 @@ def analytics(request):
                'data': data}
 
     return render(request, 'analytics.html', context)
+
+
+def comparison(request):
+    today = date.today()
+
+    timesheet_list = TblTimeSheet.objects.all()
+
+    # employee_timesheet = TblTimeSheet.objects.filter(employee_id=request.user.username)
+    employee_timesheet = TblTimeSheet.objects.all()
+    employee_timesheet_projects = employee_timesheet.values('employee_id', 'provider_id', 'provider_id__provider_name',
+                                                            'time_code', 'fye',
+                                                            'time_code_id__time_code_description',
+                                                            'time_code_id__time_code_hours_budget').annotate(
+        sum_of_project_hours=Sum('hours')).order_by('-sum_of_project_hours')
+    # employee_todolist = TblToDoList.objects.filter(employee_id=request.user.username)
+    employee_todolist = TblToDoList.objects.all()
+
+    employee_todolist_projects = employee_todolist.values('employee_id', 'provider_id', 'provider_id__provider_name',
+                                                          'time_code', 'fye',
+                                                          'time_code_id__time_code_description').annotate(
+        count_of_project=Count('provider_id'))
+
+    comparison_projects = []
+
+    for item in employee_timesheet_projects:
+        item_todo = employee_todolist_projects.filter(provider_id=item['provider_id'], time_code=item['time_code'],
+                                                      fye=item['fye'])
+        for todo in item_todo:
+            item['todo_count'] = todo['count_of_project']
+            item['todo_hours'] = todo['count_of_project'] * 8
+            item['accuracy'] = round(item['sum_of_project_hours'] / (todo['count_of_project'] * 8) * 100)
+    # print(employee_timesheet_projects)
+
+    timesheet_filter = TimeSheetFilter(request.GET, queryset=employee_timesheet_projects)
+
+    context = {
+        'user': request.user.username,
+        'employee_timesheet_projects': employee_timesheet_projects,
+        'employee_todolist_projects': employee_todolist_projects,
+        'comparison_projects': comparison_projects,
+        'timesheet_filter': timesheet_filter
+    }
+
+    return render(request, 'comparison.html', context)
 
 
 def password_reset_request(request):
