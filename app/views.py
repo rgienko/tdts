@@ -388,7 +388,7 @@ def analytics(request):
 
     return render(request, 'analytics.html', context)
 
-
+@login_required()
 def comparison(request):
     today = date.today()
 
