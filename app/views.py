@@ -290,6 +290,38 @@ class TimesheetView(PermissionRequiredMixin, TemplateView):
         return self.render_to_response({'form': form})
 
 
+def addExpense(request, pk):
+    timesheet_entry = get_object_or_404(TblTimeSheet, pk=pk)
+
+    today = date.today()
+    week_beg = today - timedelta(days=today.weekday())
+    week_end = week_beg + timedelta(days=5)
+
+    current_timesheet = TblTimeSheet.objects.filter(employee_id=request.user.username).filter(
+        date__lte=week_end).filter(date__gte=week_beg).order_by('date')
+
+    current_expense = TblTimeSheet.objects.raw('SELECT * '
+                                               'FROM app_tbltimesheet '
+                                               'JOIN app_tblexpense ON app_tbltimesheet.id = app_tblexpense.timesheet_id_id '
+                                               'JOIN app_expensecategory ON app_expensecategory.id = app_tblexpense.expense_category_id'
+                                               )
+
+    if request.method == 'POST':
+        expense_form = ExpenseForm(request.POST)
+
+        if expense_form.is_valid():
+            expense_entry = expense_form.save(commit=False)
+            expense_entry.timesheet_id = timesheet_entry
+            expense_entry.save()
+            return redirect(reverse_lazy('timesheet'))
+
+    else:
+        expense_form = ExpenseForm()
+
+    return render(request, 'expense.html', {'expense_form': expense_form, 'timesheet_entry': timesheet_entry,
+                                            'current_expense': current_expense})
+
+
 @login_required()
 def editTimesheetEntry(request, pk):
     entry_instance = get_object_or_404(TblTimeSheet, pk=pk)
@@ -387,6 +419,7 @@ def analytics(request):
                'data': data}
 
     return render(request, 'analytics.html', context)
+
 
 @login_required()
 def comparison(request):

@@ -50,6 +50,9 @@ class TblProvider(models.Model):
     provider_name = models.CharField(max_length=100)
     parent = models.ForeignKey(TblParent, on_delete=models.CASCADE)
 
+    class Meta:
+        ordering = ['provider_id', ]
+
     def __str__(self):
         return self.provider_id + "-" + self.provider_name
 
@@ -89,6 +92,7 @@ class TblTimeSheet(models.Model):
     def get_project_budget(self):
         return self.time_code.time_code_hours_budget
 
+
     class Meta:
         default_permissions = ('view', 'add', 'delete', 'change')
 
@@ -107,3 +111,24 @@ class TblToDoList(models.Model):
 
     def get_providername(self):
         return self.provider_id.provider_name
+
+
+class ExpenseCategory(models.Model):
+    id = models.AutoField(primary_key=True)
+    expense_category = models.CharField(null=True, blank=True, max_length=40)
+
+    class Meta:
+        ordering = ['id']
+
+    def __str__(self):
+        return str(self.expense_category)
+
+
+class TblExpense(models.Model):
+    id = models.AutoField(primary_key=True)
+    timesheet_id = models.ForeignKey(TblTimeSheet, on_delete=models.CASCADE)
+    expense_category_id = models.ForeignKey(ExpenseCategory, on_delete=models.CASCADE)
+    expense_amount = models.DecimalField(null=True, blank=True, max_digits=10, decimal_places=2)
+
+    def get_expense_category(self):
+        return self.expense_category_id.expense_category

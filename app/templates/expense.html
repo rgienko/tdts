@@ -1,0 +1,85 @@
+{% extends 'layout.html' %}
+{% load crispy_forms_filters %}
+
+{% block content %}
+    {% load humanize %}
+    {% load crispy_forms_tags %}
+    <div class="container-fluid mt-4">
+        <div class="d-flex justify-content-evenly flex-row flex-xl-nowrap flex-lg-wrap flex-md-wrap flex-sm-wrap srg-bg-secondary rounded-4 my-4 p-2 table-responsive-md">
+            <div class="flex-xl-grow-0 flex-md-grow-1 rounded-2 border px-2">
+                <h4 class="text-start fs-2 py-2 fw-normal border-bottom">Expense Form</h4>
+                <form class="" method="POST">
+                    {% csrf_token %}
+                    {% for field in expense_form %}
+                        <div class="fieldWrapper mb-3">
+                            {{ field.label_tag }} <br>{{ field }}
+                            {% if field.help_text %}
+                            <p class="help">{{ field.help_text|safe }}</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+
+                    <button class="srg-btn-primary btn btn-primary my-2" style="background-color: #01359b;border: 1px solid #01359b" type="submit">Save Expense</button>
+                </form>
+            </div>
+            <div class="flex-xl-grow-0 flex-md-grow-1 px-2">
+                <h4 class="text-start py-2 fw-normal fs-2 border-bottom"> Applicable Timesheet Entry</h4>
+                <table class="table table-sm text-center table-bordered align-middle">
+                <thead>
+                    <tr class="text-center srg-bg-primary text-white border-0">
+                        <th class="fw-semibold border-0">Date</th>
+                        <th class="fw-semibold border-0">Provider</th>
+                        <th class="fw-semibold border-0">Time Code</th>
+                        <th class="fw-semibold border-0">Hours</th>
+                        <th class="fw-semibold border-0">Type</th>
+                        <th class="fw-semibold border-0">FYE</th>
+                        <th class="fw-semibold border-0">Note</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ timesheet_entry.date|date:'m/d/Y' }}</td>
+                        <td class="text-start">{{ timesheet_entry.provider_id }}</td>
+                        <td class="text-start">{{ timesheet_entry.time_code }}</td>
+                        <td>{{ timesheet_entry.hours }}</td>
+                        <td class="text-start">{{ timesheet_entry.type_id }}</td>
+                        <td>{{ timesheet_entry.fye|date:'m/d/Y' }}</td>
+                        <td class="text-start">{{ timesheet_entry.note }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            </div>
+
+        </div>
+        <div class="row">
+            <h4 class="text-start fs-2 py-2 fw-normal border-bottom">Current Expense Sheet</h4>
+            <table class="table table-sm text-center table-bordered align-middle">
+                <thead>
+                    <tr class="text-center srg-bg-primary text-white border-0">
+                        <th class="fw-semibold border-0">Date</th>
+                        <th class="fw-semibold border-0">Provider</th>
+                        <th class="fw-semibold border-0">Time Code</th>
+                        <th class="fw-semibold border-0">FYE</th>
+                        <th class="fw-semibold border-0">Expense Category</th>
+                        <th class="fw-semibold border-0">Expense Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in current_expense %}
+                        <tr>
+                            <td>{{ entry.date|date:'m/d/Y' }}</td>
+                            <td>{{ entry.provider_id }}</td>
+                            <td>{{ entry.time_code }}</td>
+                            <td>{{ entry.fye|date:'m/d/Y' }}</td>
+                            <td>{{ entry.expense_category }}</td>
+                            <td>{{ entry.expense_amount }}</td>
+                        </tr>
+
+                    {% endfor %}
+                </tbody>
+            </table>
+
+
+        </div>
+    </div>
+{% endblock %}

@@ -25,7 +25,12 @@ class TimeCodeAdmin(admin.ModelAdmin):
     list_display = ('time_code', 'time_code_description', 'time_code_hours_budget')
 
 
+class ExpenseCategoryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'expense_category')
+
+
 admin.site.register(TblProvider, ProviderAdmin)
 admin.site.register(TblTypes, TypesAdmin)
 admin.site.register(TblTimeSheet, TimeSheetAdmin)
 admin.site.register(TblTimeCode, TimeCodeAdmin)
+admin.site.register(ExpenseCategory, ExpenseCategoryAdmin)

@@ -23,7 +23,9 @@ ToDoListFormSet = modelformset_factory(TblToDoList,
                                        extra=5, min_num=1,
                                        widgets={'date': DatePickerInput,
                                                 'fye': DatePickerInput})
-                                                # 'note': forms.TextInput(attrs={'size': 50})})
+
+
+# 'note': forms.TextInput(attrs={'size': 50})})
 
 
 class EditFormToDo(forms.ModelForm):
@@ -102,4 +104,16 @@ class ToDoForm(forms.ModelForm):
         widgets = {
             'date': DatePickerInput,
             'fye': DatePickerInput
+        }
+
+
+class ExpenseForm(forms.ModelForm):
+    class Meta:
+        model = TblExpense
+
+        fields = ['expense_category_id', 'expense_amount']
+
+        labels = {
+            'expense_category_id': _('Item'),
+            'expense_amount': _('Amount')
         }

@@ -23,6 +23,7 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('main/', views.main, name='main'),
     path('main/timesheet/', views.TimesheetView.as_view(), name='timesheet'),
+    path('main/timesheet/expense/<pk>', views.addExpense, name='add-expense'),
     path('main/timesheet/update/<pk>/', views.editTimesheetEntry, name='edit-timesheet'),
     path('main/timesheet/bulk/', views.BulkTimeSheet.as_view(), name='timesheet-bulk'),
     path('main/todolist/', views.ToDoListView.as_view(), name='todolist'),
