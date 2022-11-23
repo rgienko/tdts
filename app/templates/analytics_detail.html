@@ -13,9 +13,9 @@
                 {% endfor %}
             </div>
         </div>
-        <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-xxl-between justify-content-sm-center mt-4">
+        <div class="row srg-bg-secondary rounded-4 p-2 text-white d-flex justify-content-xxl-between justify-content-sm-center mt-4">
             <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6 border-lg rounded-2 py-4">
-                <h4 class="text-center">Hours by Employee</h4>
+                <h4 class="text-center srg-header">Hours by Employee</h4>
                 <canvas id="myChart" width="100" height="100"></canvas>
                 <script>
                     const config = {
@@ -34,7 +34,7 @@
                                 legend: {
                                     position: 'bottom',
                                     labels: {
-                                        color: "white",
+                                        color: "black",
                                     }
                                 }
                             }
@@ -43,7 +43,7 @@
                 </script>
             </div>
             <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6 border-lg rounded-2 py-4">
-                <h4 class="text-center">Total Hours</h4>
+                <h4 class="text-center srg-header">Total Hours</h4>
                 <canvas id="myChart2" width="100" height="100"></canvas>
                 <script>
                     const config2 = {
@@ -52,9 +52,9 @@
                             labels:['Used', 'Available'],
                             datasets: [{
                                 label: ['Used', 'Available'],
-                                data: [{% for i in proj_hours %}{{ i.sum_of_project_hours }},{{ i.time_code_id__time_code_hours_budget }}{% endfor %}],
-                                backgroundColor: ['#A6B1ED','#B4B8CD'],
-                                borderColor: ['#A6B1ED','#B4B8CD'],
+                                data: [{% for i in proj_hours %}{{ i.sum_of_project_hours }},{{ i.project_hours_remain }}{% endfor %}],
+                                backgroundColor: ['#02308C','#8B0000'],
+                                borderColor: ['#02308C','#8B0000'],
                             }]
                         },
                         options: {
@@ -62,7 +62,7 @@
                                 legend: {
                                     position: 'bottom',
                                     labels: {
-                                        color: "white"
+                                        color: "black"
                                     }
                                 }
                             }
@@ -72,7 +72,7 @@
                 </script>
             </div>
             <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6 border-lg rounded-2 py-4">
-                <h4 class="text-center">Total Cost</h4>
+                <h4 class="text-center srg-header">Total Cost</h4>
                 <canvas id="myChart3" width="100" height="100"></canvas>
                 <script>
                     const config3 = {
@@ -82,8 +82,8 @@
                             datasets: [{
                                 label: ['Used', 'Available'],
                                 data: [{% for i in proj_dollars %}{{ i }},{% endfor %}],
-                                backgroundColor: ['#A6B1ED','#B4B8CD'],
-                                borderColor: ['#A6B1ED','#B4B8CD'],
+                                backgroundColor: ['#02308C','#543D19'],
+                                borderColor: ['#02308C','#543D19'],
                             }]
                         },
                         options: {
@@ -91,7 +91,7 @@
                                 legend: {
                                     position: 'bottom',
                                     labels: {
-                                        color: "white"
+                                        color: "black"
                                     }
                                 }
                             }
@@ -113,45 +113,39 @@
             </div>
         </div>
 
-         <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-center mt-4">
+         <div class="row srg-bg-secondary rounded-4 p-2 text-white d-flex justify-content-center mt-4">
 
-            <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 pt-3 px-3">
-                <div class="row border-bottom d-flex justify-content-evenly">
-                    <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3 text-center">
-                        Employee
-                    </div>
-                    <div class="col-xxl-2 col-xl-2 col-lg-2 col-md-2 col-sm-2 text-center">
-                        Date
-                    </div>
-                    <div class="col-xxl-1 col-xl-1 col-lg-1 col-md-2 col-sm-1 text-center">
-                        Hours
-                    </div>
-                    <div class="col-xxl-1 col-xl-1 col-lg-1 col-md-2 col-sm-1 text-center">
-                        Rate
-                    </div>
-                    <div class="col-xxl-1 col-xl-1 col-lg-1 col-md-2 col-sm-1  text-center">
-                        Cost
-                    </div>
-                </div>
-                {% for emp in proj_emp_detail %}
-                     <div class="my-link row my-4 border rounded-4 py-2 d-flex justify-content-evenly" >
-                        <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3 text-center">
-                            {{ emp.employee_id }}
-                        </div>
-                        <div class="col-xxl-2 col-xl-2 col-lg-2 col-md-2 col-sm-2 text-center">
-                            {{ emp.date|date:'m/d/Y' }}
-                        </div>
-                        <div class="col-xxl-1 col-xl-1 col-lg-1 col-md-2 col-sm-1 text-center">
-                            {{ emp.hours }}
-                        </div>
-                        <div class="col-xxl-1 col-xl-1 col-lg-1 col-md-2 col-sm-1 text-center">
-                            {{ emp.get_rate }}
-                        </div>
-                        <div class="col-xxl-1 col-xl-1 col-lg-1 col-md-2 col-sm-1 text-center">
-                            {{ emp.hours|mul:emp.get_rate|intcomma }}
-                        </div>
-                     </div>
-                {% endfor %}
+            <div class="col-xxl-8 col-xl-10 col-lg-12 col-md-12 col-sm-12 col-12 pt-3 px-3">
+                <div class="row">
+                    <h4 class="text-start py-2 fw-normal fs-2 border-bottom srg-header">Employee Breakdown</h4>
+                    <table class="table table-bordered">
+                        <thead class="srg-bg-primary">
+                            <tr class="text-white text-center">
+                                <th>Employee</th>
+                                <th>Hours</th>
+                                <th>Rate</th>
+                                <th>Cost</th>
+                            </tr>
+
+                        </thead>
+                            {% for emp in proj_emp_detail_aggr %}
+                                <tr>
+                                    <td class="">
+                                        {{ emp.employee_id }}
+                                    </td>
+                                    <td class="">
+                                        {{ emp.emp_sum_of_project_hours }}
+                                    </td>
+                                    <td class="">
+                                        {{ emp.employee_id__employee_title__rate }}
+                                    </td>
+                                    <td class="">
+                                        $ {{ emp.emp_sum_of_project_hours|mul:emp.employee_id__employee_title__rate|intcomma }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                    </table>
+
             </div>
 
          </div>

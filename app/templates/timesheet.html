@@ -5,7 +5,7 @@
     {% load humanize %}
     {% load crispy_forms_tags %}
     <div class="container-fluid mt-4">
-        <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-center">
+        <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-center" style="background:#02308C">
             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 rounded-4 text-center">
                 <h2 class="display-4 fw-normal">{{ user.first_name }}'s Timesheet</h2>
                 <h4 class="fw-normal">Today: {{ today|date:'D m/d/Y' }}</h4>
@@ -26,7 +26,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for project in top_projects.all %}
+                        {% for project in top_projects_agg.all %}
                             <tr>
                                 <td>{{ project.provider_id }} {{ project.provider_id__provider_name }}</td>
                                 <td>{{ project.time_code }} {{ project.time_code_id__time_code_description }}</td>
@@ -39,7 +39,7 @@
 
             </div>
 
-            <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12 border rounded-2 pt-3 mt-md-2">
+            <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12 border rounded-2 pt-3">
                 <h4 class="text-center">Weekly Hours Total</h4>
                 <h1 class="display-1 text-center">{% if total_hours.sum_of_hours is None %}0.00{% else %}{{ total_hours.sum_of_hours }}{% endif %}</h1>
 
@@ -93,8 +93,8 @@
                         </div>
                     {% endfor %}
 
-                    <button class="srg-btn-primary btn btn-primary my-2" style="background-color: #01359b;border: 1px solid #01359b" type="submit">Save Entry</button>
-                    <a class="mx-3" href="{% url 'timesheet-bulk' %}">Bulk Form</a>
+                    <button class="srg-btn-primary my-2" type="submit">Save Entry</button>
+                    <a class="srg-link mx-3" href="{% url 'timesheet-bulk' %}">Bulk Form</a>
                 </form>
             </div>
             <div class="flex-xl-grow-0 flex-md-grow-1 px-2">
@@ -122,54 +122,18 @@
                             <td class="text-start">{{ rec.type_id }}</td>
                             <td>{{ rec.fye|date:'m/d/Y' }}</td>
                             <td class="text-start">{{ rec.note }}</td>
-                            <td class="m-0 p-0 text-center" style="min-width:150px;">
-                                <a type="button" class="btn btn-success" href="{% url 'add-expense' rec.id %}">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="30" fill="currentColor" class="bi bi-currency-dollar" viewBox="0 0 16 16">
-                                        <path d="M4 10.781c.148 1.667 1.513 2.85 3.591 3.003V15h1.043v-1.216c2.27-.179 3.678-1.438 3.678-3.3 0-1.59-.947-2.51-2.956-3.028l-.722-.187V3.467c1.122.11 1.879.714 2.07 1.616h1.47c-.166-1.6-1.54-2.748-3.54-2.875V1H7.591v1.233c-1.939.23-3.27 1.472-3.27 3.156 0 1.454.966 2.483 2.661 2.917l.61.162v4.031c-1.149-.17-1.94-.8-2.131-1.718H4zm3.391-3.836c-1.043-.263-1.6-.825-1.6-1.616 0-.944.704-1.641 1.8-1.828v3.495l-.2-.05zm1.591 1.872c1.287.323 1.852.859 1.852 1.769 0 1.097-.826 1.828-2.2 1.939V8.73l.348.086z"/>
-                                    </svg>
+                            <td class="gap-2 d-flex justify-content-center align-items-middle"  style="min-width:150px;">
+                                <a type="button" class="srg-success-button btn" href="{% url 'add-expense' rec.id %}">
+                                    <i class="bi bi-currency-dollar fs-5"></i>
                                 </a>
-                                <a type="button" class="btn btn-primary" style="background-color: #7178A1;border: 1px solid #7178A1" href="{% url 'edit-timesheet' rec.id %}">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="30" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                                        <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                                        <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
-                                    </svg>
+                                <a type="button" class="btn srg-btn-primary-sm" href="{% url 'edit-timesheet' rec.id %}">
+                                    <i class="bi bi-pencil-square fs-5"></i>
                                 </a>
-                                <a type="button" class="btn btn-danger" href="">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="30" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
-                                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
-                                    </svg>
+                                <a type="button" class="btn srg-danger-button" href="">
+                                   <i class="bi bi-trash fs-5"></i>
                                 </a>
-
                             </td>
                         </tr>
-
-                        <div class="modal" tabindex="-1" id="expenseModal{{ rec.id }}" aria-labelledby="expenseModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Report Expense - {{ rec.id }}</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form class="" method="POST">
-                                            {% csrf_token %}
-
-                                            {% for field in expense_form %}
-                                                <div class="fieldWrapper mb-3">
-                                                    {{ expense_form.label_tag }} <br>{{ field }}
-                                                    {% if expense_form.help_text %}
-                                                    <p class="help">{{ expense_form.help_text|safe }}</p>
-                                                    {% endif %}
-                                                </div>
-                                            {% endfor %}
-
-                                            <button class="srg-btn-primary btn btn-primary my-2" id="expense-button" style="background-color: #01359b;border: 1px solid #01359b" type="submit">Save Expense</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
                     {% endfor %}
                 </tbody>

@@ -1,6 +1,9 @@
 {% extends 'layout.html' %}
 {% load crispy_forms_tags %}
 {% block content %}
+    {% load static %}
+
+        <link rel="stylesheet" href="{% static 'css/site.css' %}">
     <div class="container-fluid p-0 overflow-visible">
         <div class="row d-flex justify-content-center mt-2">
             <div class="col-xl-5 srg-bg-secondary border card px-5 pt-5">
@@ -21,9 +24,9 @@
                                 {% endif %}
                             </div>
                         {% endfor %}
-                        <div class="d-grid gap-2 d-md-flex justify-content-start mb-4">
-                            <input type="submit" name="save" value="Save" class="btn btn-primary mt-2 px-4 me-2"/>
-                            <a class="btn btn-info mt-2 px-4" href="{% url 'timesheet' %}">Cancel</a>
+                        <div class="d-grid gap-2 d-md-flex align-items-center mb-4">
+                            <button type="submit" name="save" value="Save" class="srg-btn-primary btn">Save Entry</button>
+                            <a class="srg-link" href="{% url 'timesheet' %}">Cancel</a>
                         </div>
                     </form>
                 </div>

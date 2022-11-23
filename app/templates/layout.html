@@ -37,19 +37,22 @@
         <script src="{% static 'fullcalendar/main.js' %}"></script>
     </head>
 <body>
-    <nav class="navbar navbar-expand-lg bg-light sticky-top">
+    <nav class="navbar navbar-expand-lg srg-bg-secondary sticky-top">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'main' %}">App Name</a>
+            <a class="navbar-brand fs-4" style="color:#02308C" href="{% url 'main' %}">
+                <img src="{% static 'img/starLogo.png' %}" alt="Logo" width="42" height="48">TandE
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
+
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <ul class="my-list navbar-nav me-auto mb-2 mb-lg-0" data-bs-toggle="list">
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="{% url 'timesheet' %}">My Timesheet</a>
+                        <a class="nav-link" aria-current="true"  href="{% url 'timesheet' %}">My Timesheet</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'todolist' %}">My To-Do List</a>
+                        <a class="nav-link" aria-current="false" href="{% url 'todolist' %}">My To-Do List</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'analytics' %}">Analytics</a>
@@ -72,5 +75,7 @@
         {% endblock %}
     </div>
 
+
+</script>
 </body>
 </html>

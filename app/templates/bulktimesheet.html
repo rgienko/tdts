@@ -41,7 +41,7 @@
                     {% endfor %}
                 </table>
 
-                <button class="srg-btn-primary btn btn-primary" style="background-color: #7178A1;border: 1px solid #7178A1" type="submit">Save Timesheet</button>
+                <button class="srg-btn-primary" type="submit">Save Timesheet</button>
             </form>
         </div>
 
@@ -50,7 +50,7 @@
             <h4 class="text-center p-3 fw-semibold">Current Week Timesheet</h4>
                 <table class="table text-center table-bordered">
                 <thead>
-                    <tr class="text-center">
+                    <tr class="text-center text-white border-0 srg-bg-primary">
                         <th class="fw-semibold">Date</th>
                         <th class="fw-semibold">Provider</th>
                         <th class="fw-semibold">Time Code</th>
@@ -69,7 +69,7 @@
                             <td>{{ rec.hours }}</td>
                             <td>{{ rec.type_id }}</td>
                             <td>{{ rec.fye|date:'m/d/Y' }}</td>
-                            <td>{{ rec.note }}</td>
+                            <td class="text-start">{{ rec.note }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

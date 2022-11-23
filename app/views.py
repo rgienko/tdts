@@ -213,8 +213,12 @@ class BulkTimeSheet(TemplateView):
     def get(self, *args, **kwargs):
         formset = TimeSheetFormSet(queryset=TblTimeSheet.objects.none())
 
+        current_timesheet = TblTimeSheet.objects.filter(employee_id=self.request.user.username).filter(
+            date__lte=self.week_end).filter(date__gte=self.week_beg).order_by('date')
+
         return self.render_to_response({'timesheet_formset': formset, 'today': self.today,
-                                        'week_beg': self.week_beg, 'week_end': self.week_end})
+                                        'week_beg': self.week_beg, 'week_end': self.week_end,
+                                        'current_timesheet': current_timesheet})
 
     def post(self, *args, **kwargs):
         formset = TimeSheetFormSet(data=self.request.POST)
@@ -263,8 +267,14 @@ class TimesheetView(PermissionRequiredMixin, TemplateView):
         thirty_contingency_hours = thirty_timesheet.filter(type_id='C').aggregate(sum_of_hours=Sum('hours'))
         thirty_non_hours = thirty_timesheet.filter(type_id='N').aggregate(sum_of_hours=Sum('hours'))
 
-        top_projects = thirty_timesheet.values('provider_id', 'provider_id__provider_name', 'time_code', 'fye',
-                                               'time_code_id__time_code_description').annotate(
+        # top_projects = thirty_timesheet.values('provider_id', 'provider_id__provider_name', 'time_code', 'fye',
+        #                                      'time_code_id__time_code_description').annotate(
+        #   sum_of_project_hours=Sum('hours')).order_by('-sum_of_project_hours')[:5]
+
+        timesheet_total = TblTimeSheet.objects.filter(employee_id=self.request.user.username).order_by('-date')
+
+        top_projects_agg = timesheet_total.values('provider_id', 'provider_id__provider_name', 'time_code', 'fye',
+                                                  'time_code_id__time_code_description').annotate(
             sum_of_project_hours=Sum('hours')).order_by('-sum_of_project_hours')[:5]
 
         return self.render_to_response({'form': form, 'current_timesheet': current_timesheet,
@@ -276,7 +286,8 @@ class TimesheetView(PermissionRequiredMixin, TemplateView):
                                         'thirty_hourly_hours': thirty_hourly_hours,
                                         'thirty_contingency_hours': thirty_contingency_hours,
                                         'thirty_non_hours': thirty_non_hours,
-                                        'top_projects': top_projects})
+                                        # 'top_projects': top_projects,
+                                        'top_projects_agg': top_projects_agg})
 
     def post(self, *args, **kwargs):
         form = TimeSheetForm(self.request.POST)
@@ -345,6 +356,10 @@ def editTimesheetEntry(request, pk):
 
 def analytics_detail(request, prov, tc, fy):
     proj_emp_detail = TblTimeSheet.objects.filter(provider_id=prov, time_code=tc, fye=fy)
+
+    proj_emp_detail_aggr = proj_emp_detail.values('employee_id', 'employee_id__employee_title__rate').annotate(
+        emp_sum_of_project_hours=Sum('hours')).order_by('-emp_sum_of_project_hours')
+
     proj_detail = proj_emp_detail[:1]
 
     proj_hours = proj_emp_detail.values('provider_id', 'provider_id__provider_name', 'time_code', 'fye',
@@ -358,6 +373,7 @@ def analytics_detail(request, prov, tc, fy):
     proj_dollars = []
 
     for h in proj_hours:
+        h['project_hours_remain'] = h['time_code_id__time_code_hours_budget'] - h['sum_of_project_hours']
         proj_dollars.append(h['sum_of_project_hours'] * 250)
         proj_dollars.append((h['time_code_id__time_code_hours_budget'] - h['sum_of_project_hours']) * 250)
 
@@ -371,14 +387,14 @@ def analytics_detail(request, prov, tc, fy):
         # proj_dollars.append(e['time_code_id__time_code_hours_budget'] * 250)
         color.append((random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)))
 
-    print(proj_hours)
     context = {'proj_emp_detail': proj_emp_detail,
                'proj_detail': proj_detail,
                'labels': labels,
                'data': data,
                'color': color,
                'proj_dollars': proj_dollars,
-               'proj_hours': proj_hours}
+               'proj_hours': proj_hours,
+               'proj_emp_detail_aggr': proj_emp_detail_aggr}
 
     return render(request, 'analytics_detail.html', context)
 

@@ -29,15 +29,15 @@
             .login-dark form .form-control {
                 background: none;
                 border: none;
-                border-bottom: 1px solid #ffffff;
+                border-bottom: 1px solid black;
                 border-radius: 0;
                 box-shadow: none;
                 outline: none;
-                color: #ffffff;
+                color: black;
             }
 
             .login-dark form .btn-primary {
-                background: #B4B8CD;
+                background: #02308C;
                 border: none;
                 border-radius: 4px;
                 padding: 11px;
@@ -49,18 +49,19 @@
 
             .login-dark form .btn-secondary:hover, .login-dark form .btn-secondary:active {
                 background: #A6B1ED;
-                outline: none;
+                border: 1px solid #A6B1ED;
             }
 
             .login-dark form .btn-secondary {
-                background: #A6B1ED;
-                border: none;
+                background: white;
+                border: 1px solid #A6B1ED;
                 border-radius: 4px;
                 padding: 11px;
                 box-shadow: none;
                 margin-top: 26px;
                 text-shadow: none;
                 outline: none;
+                color: #A6B1ED
             }
 
             .login-dark form .btn-primary:hover, .login-dark form .btn-primary:active {
@@ -93,27 +94,27 @@
         {% load static %}
         <link rel="stylesheet" href="{% static 'css/site.css' %}">
     </head>
-    <body class="text-center srg-bg-secondary">
+    <body class="text-center srg-bg-primary">
 
     <main class="form-signin vh-100 align-items-center d-flex justify-content-center">
-        <div class="login-dark card col-xl-3 px-5 srg-bg-primary">
-            <form class="text-light" method="POST">
+        <div class="login-dark card col-xl-3 px-5">
+            <form class="" method="POST">
                 {% csrf_token %}
-                <i class="bi bi-lock-fill" style="font-size:6rem"></i>
-                <h1 class="h3 fw-normal"> Sign In</h1>
+                <i class="bi bi-lock-fill" style="font-size:6rem; color:#02308C;"></i>
+                <h1 class="h3 fw-normal" style="color:#02308C"> Sign In</h1>
 
-                <div class="form-floating mt-2 text-light">
+                <div class="form-floating mt-2">
                     <input type="text" class="form-control" id="floatingInput" placeholder="Username" name="username">
                     <label for="floatingInput">Username</label>
                 </div>
-                <div class="form-floating mt-2 text-light">
+                <div class="form-floating mt-2">
                     <input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="password">
                     <label for="floatingPassword">Password</label>
 
                 </div>
 
-                <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-2">
-                    <button class="btn btn-primary" style="background:#C3C6D7" type="submit">Sign in</button>
+                <div class="gap-2 d-md-flex justify-content-md-end mb-2">
+                    <button class="btn btn-primary px-4" type="submit">Sign in</button>
                     <a class="btn btn-secondary" href="{% url 'register' %}">Sign Up</a>
                 </div>
 

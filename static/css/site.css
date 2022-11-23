@@ -4,7 +4,11 @@
 }
 
 .srg-bg-primary {
-    background: #01359b
+    background: #02308C
+}
+
+.srg-header {
+    color: #02308C
 }
 
 .srg-bg-secondary {
@@ -12,9 +16,43 @@
 }
 
 .srg-btn-primary {
-    background-color: #01359b;
+    background-color: #02308C;
+    border: 1px solid #02308C;
+    color: #ffffff;
+    padding: 8px 16px 8px 16px;
+    border-radius: 12px;
 }
 
 .my-link:hover {
-    background-color: #B4B8CD
+    text-decoration:underline;
+    box-shadow: 0 0 8px #C3C6D7;
+}
+
+.srg-link {
+    color: #02308C
+}
+
+.srg-btn-primary:hover {
+    border: 1px solid #02308C;
+    background: white;
+    color: #02308C
+
+}
+
+.srg-success-button {
+    background:  #543D19;
+    color: white;
+    padding:6px 10px 6px 10px
+}
+
+.srg-danger-button {
+    background:  #8B0000;
+    color: white;
+    padding:6px 10px 6px 10px
+}
+
+.srg-btn-primary-sm {
+    background-color: #02308C;
+    color: #ffffff;
+    padding: 6px 10px 6px 10px;
 }
