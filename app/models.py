@@ -62,6 +62,9 @@ class TblTimeCode(models.Model):
     time_code_description = models.TextField(max_length=75)
     time_code_hours_budget = models.IntegerField(null=True, blank=True)
 
+    class Meta:
+        ordering = ['time_code']
+
     def __str__(self):
         return str(self.time_code) + "-" + self.time_code_description
 
@@ -91,7 +94,6 @@ class TblTimeSheet(models.Model):
 
     def get_project_budget(self):
         return self.time_code.time_code_hours_budget
-
 
     class Meta:
         default_permissions = ('view', 'add', 'delete', 'change')

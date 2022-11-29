@@ -31,18 +31,23 @@
 .fc table {
     border-collapse: collapse;
     border-spacing: 0;
-    font-size: 1em; /* normalize cross-browser */
+    font-size: 1em;
+    color: #02308C/* normalize cross-browser */
   }
 .fc th {
     text-align: center;
+    color: #02308C;
+    border: 1px solid #a9a9a9;
   }
 .fc th,
   .fc td {
     vertical-align: top;
     padding: 0;
+    color: #02308C;
   }
 .fc a[data-navlink] {
     cursor: pointer;
+    color: #02308C;
   }
 .fc a[data-navlink]:hover {
     text-decoration: underline;
@@ -57,8 +62,8 @@
 }
 .fc-theme-standard td,
   .fc-theme-standard th {
-    border: 1px solid #ddd;
-    border: 1px solid var(--fc-border-color, #ddd);
+    border: 1px solid #a9a9a9;
+    border: 1px solid var(--fc-border-color, #a9a9a9);
   }
 /* for FF, which doesn't expand a 100% div within a table cell. use absolute positioning */
 /* inner-wrappers are responsible for being absolute */
@@ -200,42 +205,42 @@ When it's NOT activated, the fc-button classes won't even be in the DOM.
 .fc .fc-button-primary {
     color: #fff;
     color: var(--fc-button-text-color, #fff);
-    background-color: #2C3E50;
-    background-color: var(--fc-button-bg-color, #2C3E50);
-    border-color: #2C3E50;
-    border-color: var(--fc-button-border-color, #2C3E50);
+    background-color: #02308C;
+    background-color: var(--fc-button-bg-color, #02308C);
+    border-color: #02308C;
+    border-color: var(--fc-button-border-color, #02308C);
   }
 .fc .fc-button-primary:hover {
     color: #fff;
-    color: var(--fc-button-text-color, #fff);
-    background-color: #1e2b37;
-    background-color: var(--fc-button-hover-bg-color, #1e2b37);
-    border-color: #1a252f;
-    border-color: var(--fc-button-hover-border-color, #1a252f);
+    color: var(--fc-button-text-color, #02308C);
+    background-color: #fff;
+    background-color: var(--fc-button-hover-bg-color, #fff);
+    border-color: #02308C;
+    border-color: var(--fc-button-hover-border-color, #02308C);
   }
 .fc .fc-button-primary:disabled { /* not DRY */
     color: #fff;
     color: var(--fc-button-text-color, #fff);
-    background-color: #2C3E50;
-    background-color: var(--fc-button-bg-color, #2C3E50);
-    border-color: #2C3E50;
-    border-color: var(--fc-button-border-color, #2C3E50); /* overrides :hover */
+    background-color: #02308C;
+    background-color: var(--fc-button-bg-color, #02308C);
+    border-color: #02308C;
+    border-color: var(--fc-button-border-color, #02308C); /* overrides :hover */
   }
 .fc .fc-button-primary:focus {
-    box-shadow: 0 0 0 0.2rem rgba(76, 91, 106, 0.5);
+
   }
 .fc .fc-button-primary:not(:disabled):active,
   .fc .fc-button-primary:not(:disabled).fc-button-active {
     color: #fff;
     color: var(--fc-button-text-color, #fff);
-    background-color: #1a252f;
-    background-color: var(--fc-button-active-bg-color, #1a252f);
-    border-color: #151e27;
-    border-color: var(--fc-button-active-border-color, #151e27);
+    background-color: #02308C;
+    background-color: var(--fc-button-active-bg-color, #02308C);
+    border-color: #02308C;
+    border-color: var(--fc-button-active-border-color, #02308C);
   }
 .fc .fc-button-primary:not(:disabled):active:focus,
   .fc .fc-button-primary:not(:disabled).fc-button-active:focus {
-    box-shadow: 0 0 0 0.2rem rgba(76, 91, 106, 0.5);
+
   }
 .fc {
 
@@ -333,8 +338,8 @@ When it's NOT activated, the fc-button classes won't even be in the DOM.
     direction: rtl;
   }
 .fc-theme-standard .fc-scrollgrid {
-    border: 1px solid #ddd;
-    border: 1px solid var(--fc-border-color, #ddd); /* bootstrap does this. match */
+    border: 1px solid #a9a9a9;
+    border: 1px solid var(--fc-border-color, #a9a9a9); /* bootstrap does this. match */
   }
 .fc .fc-scrollgrid,
     .fc .fc-scrollgrid table { /* all tables (self included) */
@@ -389,8 +394,8 @@ When it's NOT activated, the fc-button classes won't even be in the DOM.
 
 }
 .fc .fc-scrollgrid-section-sticky > * {
-    background: #fff;
-    background: var(--fc-page-bg-color, #fff);
+    background: #a9a9a9;
+    background: var(--fc-page-bg-color, #a9a9a9);
     position: sticky;
     z-index: 3; /* TODO: var */
     /* TODO: box-shadow when sticking */

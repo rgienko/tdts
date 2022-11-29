@@ -5,8 +5,8 @@
     {% load humanize %}
     {% load crispy_forms_tags %}
     <div class="container-fluid mt-4">
-        <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-center" style="background:#02308C">
-            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 rounded-4 text-center">
+        <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-center">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 rounded-4 text-start border">
                 <h2 class="display-4 fw-normal">{{ user.first_name }}'s Timesheet</h2>
                 <h4 class="fw-normal">Today: {{ today|date:'D m/d/Y' }}</h4>
                 <h4 class="fw-normal">Week: {{ week_beg|date:'D m/d/Y' }} - {{ week_end|date:'D m/d/Y' }}</h4>
@@ -80,8 +80,8 @@
 
 
         <div class="d-flex flex-row flex-xl-nowrap flex-lg-wrap flex-md-wrap flex-sm-wrap srg-bg-secondary rounded-4 my-4 p-2 table-responsive-md">
-            <div class="flex-xl-grow-0 flex-md-grow-1 rounded-2 border px-2">
-                <h4 class="text-start fs-2 py-2 fw-normal border-bottom">Timesheet Form</h4>
+            <div class="srg-border flex-xl-grow-0 flex-md-grow-1 rounded-2 px-2 ">
+                <h4 class="text-start fs-2 py-2 fw-normal" style="border-bottom:1px solid #a9a9a9">Timesheet Form</h4>
                 <form class="" method="POST">
                     {% csrf_token %}
                     {% for field in form %}
@@ -97,9 +97,9 @@
                     <a class="srg-link mx-3" href="{% url 'timesheet-bulk' %}">Bulk Form</a>
                 </form>
             </div>
-            <div class="flex-xl-grow-0 flex-md-grow-1 px-2">
-                <h4 class="text-start py-2 fw-normal fs-2 border-bottom">Current Week Timesheet</h4>
-                <table class="table table-sm text-center table-bordered align-middle">
+            <div class="flex-xl-grow-1 flex-lg-grow-1 flex-md-grow-1 px-2 srg-border ms-4">
+                <h4 class="text-start py-2 fw-normal fs-2" style="border-bottom:1px solid #a9a9a9">Current Week Timesheet</h4>
+                <table class="table table-sm text-center table-bordered align-middle" style="border:1px solid #a9a9a9">
                 <thead>
                     <tr class="text-center srg-bg-primary text-white border-0">
                         <th class="fw-semibold border-0">Date</th>
@@ -123,13 +123,13 @@
                             <td>{{ rec.fye|date:'m/d/Y' }}</td>
                             <td class="text-start">{{ rec.note }}</td>
                             <td class="gap-2 d-flex justify-content-center align-items-middle"  style="min-width:150px;">
-                                <a type="button" class="srg-success-button btn" href="{% url 'add-expense' rec.id %}">
+                                <a type="button" class="srg-success-button" href="{% url 'add-expense' rec.id %}">
                                     <i class="bi bi-currency-dollar fs-5"></i>
                                 </a>
-                                <a type="button" class="btn srg-btn-primary-sm" href="{% url 'edit-timesheet' rec.id %}">
+                                <a type="button" class="srg-btn-primary-sm" href="{% url 'edit-timesheet' rec.id %}">
                                     <i class="bi bi-pencil-square fs-5"></i>
                                 </a>
-                                <a type="button" class="btn srg-danger-button" href="">
+                                <a type="button" class="srg-danger-button" href="">
                                    <i class="bi bi-trash fs-5"></i>
                                 </a>
                             </td>

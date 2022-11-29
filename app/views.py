@@ -36,7 +36,7 @@ def login(request):
         user = auth.authenticate(username=username, password=password)
         if user is not None:
             auth.login(request, user)
-            return redirect('main')
+            return redirect('timesheet')
         else:
             messages.error(request, 'Error, wrong username or password')
         return render(request, 'login.html')

@@ -4,7 +4,7 @@
     {% load humanize %}
     <div class="container-fluid mt-4">
         <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-center">
-            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 rounded-4 text-center">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 rounded-4 text-start border">
                 <h2 class="display-4 fw-normal">{{ user.first_name }}'s To-Do List</h2>
                 <h4 class="fw-normal">Today: {{ today|date:'D m/d/Y' }}</h4>
                 <h4 class="fw-normal">Thru: {{ thru_date|date:'D m/d/Y' }}</h4>
@@ -43,8 +43,8 @@
 
         <div class="row srg-bg-secondary rounded-4 mt-4 p-2 table-responsive">
             <div class="d-flex flex-row flex-wrap srg-bg-secondary rounded-4 p-2 table-responsive-md">
-                <div class="flex-xl-grow-0 flex-md-grow-1 px-2 rounded-2 border">
-                    <h4 class="text-start fs-2 fw-normal border-bottom">To-Do Form</h4>
+                <div class="flex-xl-grow-0 flex-md-grow-1 px-2 srg-border">
+                    <h4 class="text-start fs-2 fw-normal py-2" style="border-bottom:1px solid #a9a9a9">To-Do Form</h4>
                     <form class="" method="POST">
                         {% csrf_token %}
                         {% for field in form %}
@@ -56,13 +56,13 @@
                             </div>
                         {% endfor %}
 
-                        <button class="srg-btn-primary btn btn-primary my-2" type="submit">Save Entry</button>
+                        <button class="srg-btn-primary mb-2" type="submit">Save Entry</button>
                         <a class="mx-3 srg-link" href="{% url 'todolist-bulk' %}">Bulk Form</a>
                     </form>
                 </div>
 
-                <div class="flex-grow-1 px-2">
-                    <h4 class="text-start fw-normal fs-2 border-bottom">Current To-Do List</h4>
+                <div class="flex-grow-1 px-2 srg-border ms-4">
+                    <h4 class="text-start fw-normal fs-2 py-2" style="border-bottom:1px solid #a9a9a9">Current To-Do List</h4>
                     <table class="table table-hover table-bordered text-center mt-2">
                         <thead>
                             <tr class="text-center fw-normal srg-bg-primary text-light border-0">
@@ -99,43 +99,43 @@
 
         <script>
           document.addEventListener('DOMContentLoaded', function() {
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                aspectRatio: 2,
-                navLinks:true,
-                themeSystem:'bootstrap5',
-                headerToolbar: {
-                    left:'prev,next today',
-                    center:'title',
-                    right:'dayGridMonth,dayGridWeek'
-                },
-                initialView: 'dayGridMonth',
-                businessHours: true,
-                eventColor: '#02308C',
-                events: [
-                  {% for item in todlist_items %}
-                  {
-                      title:'{{ item.title|safe }}',
-                      start: '{{ item.start|safe }}',
-                      end: '{{ item.start|safe }}'
+              const calendarEl = document.getElementById('calendar');
+              const calendar = new FullCalendar.Calendar(calendarEl, {
+                  aspectRatio: 2,
+                  navLinks: true,
+                  themeSystem: 'standard',
+                  headerToolbar: {
+                      left: 'prev,next today',
+                      center: 'title',
+                      right: 'dayGridMonth,dayGridWeek'
                   },
-                  {% endfor %}
-              ],
-                eventClick: function(info) {
-                    alert('Event: ' + info.event.title + info.event.id);
-                    //alert('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
-                    //alert('View: ' + info.view.type);
+                  initialView: 'dayGridMonth',
+                  businessHours: true,
+                  eventColor: '#02308C',
+                  events: [
+                      {% for item in todlist_items %}
+                          {
+                              title: '{{ item.title|safe }}',
+                              start: '{{ item.start|safe }}',
+                              end: '{{ item.start|safe }}'
+                          },
+                      {% endfor %}
+                  ],
+                  eventClick: function (info) {
+                      alert('Event: ' + info.event.title + info.event.id);
+                      //alert('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
+                      //alert('View: ' + info.view.type);
 
-                    // change the border color just for fun
-                    info.el.style.borderColor = 'red';
-                }
-            });
-            calendar.render();
+                      // change the border color just for fun
+                      info.el.style.borderColor = 'red';
+                  }
+              });
+              calendar.render();
           });
 
         </script>
         <div class="row mb-4 srg-bg-secondary rounded-4 my-4 p-2">
-            <div class="col-xl-12 border rounded-2 p-2">
+            <div class="col-xl-12 srg-border p-2">
                 <div class="" id='calendar'></div>
             </div>
         </div>

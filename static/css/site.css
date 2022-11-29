@@ -11,8 +11,13 @@
     color: #02308C
 }
 
+.srg-border {
+    border: 1px solid #a9a9a9;
+    border-radius: 12px;
+}
+
 .srg-bg-secondary {
-    background: #C3C6D7
+    background: #D9D9D9
 }
 
 .srg-btn-primary {
@@ -23,10 +28,12 @@
     border-radius: 12px;
 }
 
+
 .my-link:hover {
     text-decoration:underline;
     box-shadow: 0 0 8px #C3C6D7;
 }
+
 
 .srg-link {
     color: #02308C
@@ -40,19 +47,43 @@
 }
 
 .srg-success-button {
-    background:  #543D19;
+    background:  #004000;
+    border: 1px solid #004000;
     color: white;
-    padding:6px 10px 6px 10px
+    padding:5px 9px 5px 9px;
+    border-radius: 8px;
+}
+
+.srg-success-button:hover {
+    background: #ffffff;
+    border: 1px solid #004000;
+    color: #004000;
 }
 
 .srg-danger-button {
-    background:  #8B0000;
+    background: #8B0000;
+    border: 1px solid #8B0000;
     color: white;
-    padding:6px 10px 6px 10px
+    padding:5px 9px 5px 9px;
+    border-radius: 8px
+}
+
+.srg-danger-button:hover {
+    background:#ffffff;
+    border: 1px solid #8B0000;
+    color: #8B0000;
 }
 
 .srg-btn-primary-sm {
     background-color: #02308C;
+    border: 1px solid #02308C;
     color: #ffffff;
-    padding: 6px 10px 6px 10px;
+    padding: 5px 9px 5px 9px;
+    border-radius: 8px;
+}
+
+.srg-btn-primary-sm:hover {
+    background: #ffffff;
+    border: 1px solid #02308C;
+    color: #02308C;
 }
