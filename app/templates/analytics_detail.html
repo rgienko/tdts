@@ -4,8 +4,8 @@
     {% load mathfilters %}
     <div class="container-fluid mt-4">
         <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-center">
-            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 rounded-4 text-center border">
-                <h2 class="display-4 fw-normal">Project Analysis</h2>
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 rounded-4 text-start border">
+                <h3 class="fs-1 fw-normal">Project Analysis</h3>
                 {% for item in proj_detail %}
                     <h4 class="fw-normal text-start">{{ item.provider_id }}</h4>
                     <h4 class="fw-normal text-start">{{ item.time_code }}</h4>
@@ -53,8 +53,8 @@
                             datasets: [{
                                 label: ['Used', 'Available'],
                                 data: [{% for i in proj_hours %}{{ i.sum_of_project_hours }},{{ i.project_hours_remain }}{% endfor %}],
-                                backgroundColor: ['#02308C','#8B0000'],
-                                borderColor: ['#02308C','#8B0000'],
+                                backgroundColor: ['#02308C','#004000'],
+                                borderColor: ['#02308C','#004000'],
                             }]
                         },
                         options: {
@@ -82,8 +82,8 @@
                             datasets: [{
                                 label: ['Used', 'Available'],
                                 data: [{% for i in proj_dollars %}{{ i }},{% endfor %}],
-                                backgroundColor: ['#02308C','#543D19'],
-                                borderColor: ['#02308C','#543D19'],
+                                backgroundColor: ['#02308C','#8B0000'],
+                                borderColor: ['#02308C','#8B0000'],
                             }]
                         },
                         options: {
@@ -117,8 +117,8 @@
 
             <div class="col-xxl-8 col-xl-10 col-lg-12 col-md-12 col-sm-12 col-12 pt-3 px-3">
                 <div class="row">
-                    <h4 class="text-start py-2 fw-normal fs-2 border-bottom srg-header">Employee Breakdown</h4>
-                    <table class="table table-bordered">
+                    <h4 class="text-start py-2 fw-normal fs-2 srg-header" style="border-bottom:1px solid #a9a9a9">Employee Breakdown</h4>
+                    <table class="table table-bordered srg-border" >
                         <thead class="srg-bg-primary">
                             <tr class="text-white text-center">
                                 <th>Employee</th>

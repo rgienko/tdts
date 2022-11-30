@@ -17,7 +17,7 @@ class TypesAdmin(admin.ModelAdmin):
 
 
 class TimeSheetAdmin(admin.ModelAdmin):
-    list_display = ('id', 'employee_id', 'date', 'provider_id', 'time_code', 'hours',
+    list_display = ('timesheet_id', 'employee_id', 'date', 'provider_id', 'time_code', 'hours',
                     'type_id', 'fye', 'note')
 
 
@@ -26,11 +26,11 @@ class TimeCodeAdmin(admin.ModelAdmin):
 
 
 class ExpenseCategoryAdmin(admin.ModelAdmin):
-    list_display = ('id', 'expense_category')
+    list_display = ('expense_category_id', 'expense_category')
 
 
 admin.site.register(TblProvider, ProviderAdmin)
 admin.site.register(TblTypes, TypesAdmin)
 admin.site.register(TblTimeSheet, TimeSheetAdmin)
 admin.site.register(TblTimeCode, TimeCodeAdmin)
-admin.site.register(ExpenseCategory, ExpenseCategoryAdmin)
+admin.site.register(TblExpenseCategory, ExpenseCategoryAdmin)

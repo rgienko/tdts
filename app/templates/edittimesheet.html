@@ -6,14 +6,14 @@
         <link rel="stylesheet" href="{% static 'css/site.css' %}">
     <div class="container-fluid p-0 overflow-visible">
         <div class="row d-flex justify-content-center mt-2">
-            <div class="col-xl-5 srg-bg-secondary border card px-5 pt-5">
-                <h5 class="display-6">Edit Entry:</h5>
+            <div class="col-xl-5 srg-bg-secondary border card px-5 py-2">
+                <h5 class="display-6" style="border-bottom:1px solid #a9a9a9">Edit Entry:</h5>
                 <div class="card px-3 pt-3 mt-2 srg-bg-primary text-white">
                     <h4 class="fw-semibold">{{ entry_instance.provider_id }}</h4>
                     <h6 class="">{{ entry_instance.time_code }} - FYE {{ entry_instance.fye|date:'m/d/Y' }}</h6>
                     <p class="">Date: {{ entry_instance.date|date:'m/d/Y' }}</p>
                 </div>
-                <div class="mt-2">
+                <div class="srg-border p-4 mt-3">
                     <form class="" action="" method="post">
                         {% csrf_token %}
                         {% for field in form %}
@@ -24,9 +24,9 @@
                                 {% endif %}
                             </div>
                         {% endfor %}
-                        <div class="d-grid gap-2 d-md-flex align-items-center mb-4">
-                            <button type="submit" name="save" value="Save" class="srg-btn-primary btn">Save Entry</button>
-                            <a class="srg-link" href="{% url 'timesheet' %}">Cancel</a>
+                        <div class="d-grid gap-2 d-md-flex align-items-center">
+                            <button type="submit" name="save" value="Save" class="mt-2 srg-btn-primary">Save Entry</button>
+                            <a class="mt-2 srg-link" href="{% url 'timesheet' %}">Cancel</a>
                         </div>
                     </form>
                 </div>

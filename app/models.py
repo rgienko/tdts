@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
+import uuid
 
 
 # Create your models here.
@@ -19,6 +20,17 @@ class TblEmployeeTitles(models.Model):
 
     def __str__(self):
         return self.title_id
+
+
+class TblExpenseCategory(models.Model):
+    expense_category_id = models.AutoField(primary_key=True)
+    expense_category = models.CharField(null=True, blank=True, max_length=40)
+
+    class Meta:
+        ordering = ['expense_category_id']
+
+    def __str__(self):
+        return str(self.expense_category)
 
 
 class TblEmployee(models.Model):
@@ -70,7 +82,8 @@ class TblTimeCode(models.Model):
 
 
 class TblTimeSheet(models.Model):
-    id = models.AutoField(primary_key=True)
+    timesheet_id = models.AutoField(primary_key=True)
+    # expense_id = models.ForeignKey(TblExpense, on_delete=models.CASCADE, null=True, blank=True)
     employee_id = models.ForeignKey(TblEmployee, on_delete=models.CASCADE)
     date = models.DateField()
     provider_id = models.ForeignKey(TblProvider, on_delete=models.CASCADE)
@@ -99,8 +112,30 @@ class TblTimeSheet(models.Model):
         default_permissions = ('view', 'add', 'delete', 'change')
 
 
+class TblExpense(models.Model):
+    expense_id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    expense_category_id = models.ForeignKey(TblExpenseCategory, on_delete=models.CASCADE)
+    expense_amount = models.DecimalField(null=True, blank=True, max_digits=10, decimal_places=2)
+    timesheet_id = models.ForeignKey(TblTimeSheet, on_delete=models.CASCADE, blank=False, null=False)
+
+    def get_timesheet_date(self):
+        return self.timesheet_id.date
+
+    def get_timesheet_code(self):
+        return self.timesheet_id.time_code
+
+    def get_timesheet_provider(self):
+        return self.timesheet_id.provider_id
+
+    def get_timesheet_fye(self):
+        return self.timesheet_id.fye
+
+    def get_category(self):
+        return self.expense_category_id.expense_category
+
+
 class TblToDoList(models.Model):
-    id = models.AutoField(primary_key=True)
+    todolist_id = models.AutoField(primary_key=True)
     employee_id = models.ForeignKey(TblEmployee, on_delete=models.CASCADE)
     date = models.DateField()
     end = models.DateField(null=True, blank=True)
@@ -113,24 +148,3 @@ class TblToDoList(models.Model):
 
     def get_providername(self):
         return self.provider_id.provider_name
-
-
-class ExpenseCategory(models.Model):
-    id = models.AutoField(primary_key=True)
-    expense_category = models.CharField(null=True, blank=True, max_length=40)
-
-    class Meta:
-        ordering = ['id']
-
-    def __str__(self):
-        return str(self.expense_category)
-
-
-class TblExpense(models.Model):
-    id = models.AutoField(primary_key=True)
-    timesheet_id = models.ForeignKey(TblTimeSheet, on_delete=models.CASCADE)
-    expense_category_id = models.ForeignKey(ExpenseCategory, on_delete=models.CASCADE)
-    expense_amount = models.DecimalField(null=True, blank=True, max_digits=10, decimal_places=2)
-
-    def get_expense_category(self):
-        return self.expense_category_id.expense_category

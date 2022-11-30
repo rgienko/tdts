@@ -63,7 +63,7 @@
 
                 <div class="flex-grow-1 px-2 srg-border ms-4">
                     <h4 class="text-start fw-normal fs-2 py-2" style="border-bottom:1px solid #a9a9a9">Current To-Do List</h4>
-                    <table class="table table-hover table-bordered text-center mt-2">
+                    <table class="table table-hover table-bordered text-center mt-2" style="border:1px solid #a9a9a9">
                         <thead>
                             <tr class="text-center fw-normal srg-bg-primary text-light border-0">
                                 <th class="fw-semibold border-0">Date</th>
@@ -82,10 +82,10 @@
                                     <td class="text-center">{{ rec.fye|date:'m/d/Y' }}</td>
                                     <td class="gap-2 d-flex p-0 justify-content-center align-items-middle" style="min-width:50px">
 
-                                        <a type="button" class="btn srg-btn-primary-sm" href="{% url 'editToDoListEntry' rec.id %}">
+                                        <a type="button" class="srg-btn-primary-sm" href="{% url 'editToDoListEntry' rec.id %}">
                                             <i class="bi bi-pencil-square fs-5"></i>
                                         </a>
-                                        <a type="button" class="btn srg-danger-button" href="">
+                                        <a type="button" class="srg-danger-button" href="">
                                            <i class="bi bi-trash fs-5"></i>
                                         </a>
                                     </td>
@@ -103,7 +103,7 @@
               const calendar = new FullCalendar.Calendar(calendarEl, {
                   aspectRatio: 2,
                   navLinks: true,
-                  themeSystem: 'standard',
+                  themeSystem: '',
                   headerToolbar: {
                       left: 'prev,next today',
                       center: 'title',
@@ -112,6 +112,7 @@
                   initialView: 'dayGridMonth',
                   businessHours: true,
                   eventColor: '#02308C',
+                  eventDisplay: 'auto',
                   events: [
                       {% for item in todlist_items %}
                           {

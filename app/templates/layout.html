@@ -39,7 +39,7 @@
 <body>
     <nav class="navbar navbar-expand-lg srg-bg-secondary sticky-top">
         <div class="container-fluid">
-            <a class="navbar-brand fs-4" style="color:#02308C" href="{% url 'main' %}">
+            <a class="navbar-brand fs-4"href="{% url 'main' %}">
                 <img src="{% static 'img/starLogo.png' %}" alt="Logo" width="42" height="48">TandE
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,6 +53,9 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" aria-current="false" href="{% url 'todolist' %}">My To-Do List</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" aria-current="false" href="{% url 'expense-report' %}">My Expenses</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'analytics' %}">Analytics</a>

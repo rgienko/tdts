@@ -30,6 +30,7 @@ urlpatterns = [
     path('main/todolist/delete/<pk>/', views.deleteToDoListEntry, name='deleteToDoListEntry'),
     path('main/todolist/update/<pk>/', views.editToDoListEntry, name='editToDoListEntry'),
     path('main/todolist/bulk/', views.BulkToDoList.as_view(), name='todolist-bulk'),
+    path('main/expense-report/', views.expenseReport, name='expense-report'),
     path('analytics/', views.analytics, name='analytics'),
     path('analytics/detail/<prov>/<tc>/<fy>/', views.analytics_detail, name='analytics-detail'),
     path('comparison/', views.comparison, name='comparison'),

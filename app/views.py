@@ -311,11 +311,17 @@ def addExpense(request, pk):
     current_timesheet = TblTimeSheet.objects.filter(employee_id=request.user.username).filter(
         date__lte=week_end).filter(date__gte=week_beg).order_by('date')
 
-    current_expense = TblTimeSheet.objects.raw('SELECT * '
-                                               'FROM app_tbltimesheet '
-                                               'JOIN app_tblexpense ON app_tbltimesheet.id = app_tblexpense.timesheet_id_id '
-                                               'JOIN app_expensecategory ON app_expensecategory.id = app_tblexpense.expense_category_id'
-                                               )
+    current_expense = TblExpense.objects.filter(expense_amount__gt=0).filter(timesheet_id_id__date__gte=week_beg).filter(timesheet_id_id__date__lt=week_end)
+
+    total_expense = current_expense.aggregate(sum_of_expense=Sum('expense_amount'))
+
+    # total_expense = current_timesheet.aggregate(sum_of_expense=Sum('expense_amount'))
+
+    # current_expense = TblTimeSheet.objects.raw('SELECT * ' 'FROM app_tbltimesheet ' 'JOIN app_tblexpense ON
+    # app_tbltimesheet.id = app_tblexpense.timesheet_id_id ' 'JOIN app_expensecategory ON
+    # app_expensecategory.expense_category_id = app_tblexpense.expense_category_id_id ' 'WHERE
+    # app_tbltimesheet.employee_id_id = %s AND app_tbltimesheet.date ' '>= %s AND app_tbltimesheet.date < %s',
+    # [request.user.username, week_beg, week_end] )
 
     if request.method == 'POST':
         expense_form = ExpenseForm(request.POST)
@@ -330,8 +336,19 @@ def addExpense(request, pk):
         expense_form = ExpenseForm()
 
     return render(request, 'expense.html', {'expense_form': expense_form, 'timesheet_entry': timesheet_entry,
-                                            'current_expense': current_expense})
+                                            'current_expense': current_expense, 'total_expense': total_expense})
 
+
+def expenseReport(request):
+    today = date.today()
+    week_beg = today - timedelta(days=today.weekday())
+    week_end = week_beg + timedelta(days=5)
+
+    current_expense = TblExpense.objects.filter(expense_amount__gt=0).filter(timesheet_id_id__date__gte=week_beg)
+
+    total_expense = current_expense.aggregate(sum_of_expense=Sum('expense_amount'))
+
+    return render(request, 'expense_report.html', {'current_expense': current_expense, 'total_expense': total_expense})
 
 @login_required()
 def editTimesheetEntry(request, pk):
@@ -355,7 +372,10 @@ def editTimesheetEntry(request, pk):
 
 
 def analytics_detail(request, prov, tc, fy):
-    proj_emp_detail = TblTimeSheet.objects.filter(provider_id=prov, time_code=tc, fye=fy)
+    if fy == 'None':
+        proj_emp_detail = TblTimeSheet.objects.filter(provider_id=prov, time_code=tc)
+    else:
+        proj_emp_detail = TblTimeSheet.objects.filter(provider_id=prov, time_code=tc, fye=fy)
 
     proj_emp_detail_aggr = proj_emp_detail.values('employee_id', 'employee_id__employee_title__rate').annotate(
         emp_sum_of_project_hours=Sum('hours')).order_by('-emp_sum_of_project_hours')
@@ -461,7 +481,7 @@ def comparison(request):
     comparison_projects = []
 
     for item in employee_timesheet_projects:
-        item_todo = employee_todolist_projects.filter(provider_id=item['provider_id'], time_code=item['time_code'],
+        item_todo = employee_todolist_projects.filter(employee_id=item['employee_id'], provider_id=item['provider_id'], time_code=item['time_code'],
                                                       fye=item['fye'])
         for todo in item_todo:
             item['todo_count'] = todo['count_of_project']

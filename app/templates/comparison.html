@@ -44,7 +44,7 @@
                             <th class="" data-sortable="true">FYE</th>
                             <th class="" data-sortable="true">TS HRS</th>
                             <th class="" data-sortable="true">TD HRS</th>
-                            <th class="" data-sortable="true">ACC</th>
+                            <th class="" data-sortable="true">ACC (%)</th>
                         </tr>
 
                     </thead>
@@ -57,7 +57,7 @@
                                 <td>{{ entry.fye|date:'m/d/Y' }}</td>
                                 <td>{{ entry.sum_of_project_hours }}</td>
                                 <td>{{ entry.todo_hours }}</td>
-                                <td>{{ entry.accuracy }}%</td>
+                                <td>{% if entry.accuracy is None %}0{% else %}{{ entry.accuracy }}{% endif %}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
