@@ -78,7 +78,19 @@
         {% endblock %}
     </div>
 
-
-</script>
+        <script type="text/javascript">
+           $(function() {
+               const current = location.pathname;
+               console.log(current)
+               $('.nav-link').each(function () {
+                   const $this = $(this);
+                   console.log($this)
+                   if($this.attr('href').indexOf(current) !== -1){
+                       $this.css("color", "#02308C")
+                       $this.css("border-bottom", "2px solid #02308C")
+                   }
+               })
+           })
+        </script>
 </body>
 </html>
