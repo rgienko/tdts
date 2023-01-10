@@ -55,13 +55,19 @@
                         <a class="nav-link" aria-current="false" href="{% url 'todolist' %}">My To-Do List</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="false" href="{% url 'expense-report' %}">My Expenses</a>
+                        <a class="nav-link" aria-current="false" href="{% url 'my-expense' %}">My Expenses</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'analytics' %}">Analytics</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'comparison' %}">Comparison</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'srg-hours' %}">SRG Hours Report</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'srg-expense' %}">SRG Expense Report</a>
                     </li>
                 </ul>
                 {% if user.is_authenticated %}

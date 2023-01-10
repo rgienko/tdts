@@ -1,0 +1,50 @@
+{% extends 'layout.html' %}
+{% load crispy_forms_filters %}
+
+{% block content %}
+    {% load humanize %}
+    {% load crispy_forms_tags %}
+    <div class="container-fluid mt-4">
+
+        <div class="row srg-bg-secondary rounded-4 my-4 p-2 py-2 table-responsive-md d-flex justify-content-between">
+            <h4 class="text-start fs-2 py-2 fw-normal" style="border-bottom: 1px solid #a9a9a9">Strategic Expense Report</h4>
+            <table class="table table-sm table-bordered srg-border align-middle">
+                <thead>
+                    <tr class="text-center srg-bg-primary text-white border-0">
+                        <th class="fw-semibold border-0">Date</th>
+                        <th class="fw-semibold border-0">Employee</th>
+                        <th class="fw-semibold border-0">Expense Item</th>
+                        <th class="fw-semibold border-0">Expense Amount</th>
+                        <th class="fw-semibold border-0">Provider</th>
+                        <th class="fw-semibold border-0">Time Code</th>
+                        <th class="fw-semibold border-0">FYE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in current_expense%}
+                        <tr>
+                            <td>{{ entry.get_timesheet_date|date:'m/d/Y' }}</td>
+                            <td>{{ entry.get_employee }}</td>
+                            <td>{{ entry.get_category }}</td>
+                            <td>{{ entry.expense_amount|intcomma }}</td>
+                            <td>{{ entry.get_timesheet_provider }}</td>
+                            <td>{{ entry.get_timesheet_code }}</td>
+                            <td>{{ entry.get_timesheet_fye|date:'m/d/Y' }}</td>
+                        </tr>
+
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td class="fw-semibold">Total:</td>
+                        <td class="fw-semibold">{{ total_expense.sum_of_expense|intcomma }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+
+
+        </div>
+    </div>
+{% endblock %}

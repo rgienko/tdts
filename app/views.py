@@ -311,7 +311,8 @@ def addExpense(request, pk):
     current_timesheet = TblTimeSheet.objects.filter(employee_id=request.user.username).filter(
         date__lte=week_end).filter(date__gte=week_beg).order_by('date')
 
-    current_expense = TblExpense.objects.filter(expense_amount__gt=0).filter(timesheet_id_id__date__gte=week_beg).filter(timesheet_id_id__date__lt=week_end)
+    current_expense = TblExpense.objects.filter(expense_amount__gt=0).filter(
+        timesheet_id_id__date__gte=week_beg).filter(timesheet_id_id__date__lt=week_end)
 
     total_expense = current_expense.aggregate(sum_of_expense=Sum('expense_amount'))
 
@@ -335,8 +336,8 @@ def addExpense(request, pk):
     else:
         expense_form = ExpenseForm()
 
-    return render(request, 'expense.html', {'expense_form': expense_form, 'timesheet_entry': timesheet_entry,
-                                            'current_expense': current_expense, 'total_expense': total_expense})
+    return render(request, 'add_expense.html', {'expense_form': expense_form, 'timesheet_entry': timesheet_entry,
+                                                'current_expense': current_expense, 'total_expense': total_expense})
 
 
 def expenseReport(request):
@@ -348,7 +349,22 @@ def expenseReport(request):
 
     total_expense = current_expense.aggregate(sum_of_expense=Sum('expense_amount'))
 
-    return render(request, 'expense_report.html', {'current_expense': current_expense, 'total_expense': total_expense})
+    return render(request, 'my_expense_report.html',
+                  {'current_expense': current_expense, 'total_expense': total_expense})
+
+
+def SRGExpenseReport(request):
+    today = date.today()
+    week_beg = today - timedelta(days=today.weekday())
+    week_end = week_beg + timedelta(days=14)
+
+    current_expense = TblExpense.objects.filter(expense_amount__gt=0).filter(timesheet_id_id__date__gte=week_beg)
+
+    total_expense = current_expense.aggregate(sum_of_expense=Sum('expense_amount'))
+
+    return render(request, 'srg_expense_report.html',
+                  {'current_expense': current_expense, 'total_expense': total_expense})
+
 
 @login_required()
 def editTimesheetEntry(request, pk):
@@ -481,7 +497,8 @@ def comparison(request):
     comparison_projects = []
 
     for item in employee_timesheet_projects:
-        item_todo = employee_todolist_projects.filter(employee_id=item['employee_id'], provider_id=item['provider_id'], time_code=item['time_code'],
+        item_todo = employee_todolist_projects.filter(employee_id=item['employee_id'], provider_id=item['provider_id'],
+                                                      time_code=item['time_code'],
                                                       fye=item['fye'])
         for todo in item_todo:
             item['todo_count'] = todo['count_of_project']
@@ -500,6 +517,24 @@ def comparison(request):
     }
 
     return render(request, 'comparison.html', context)
+
+
+def hoursReport(request):
+    today = date.today()
+    first = today.replace(day=1)
+    last_month = first - timedelta(days=1)
+    last_month = last_month.month
+    month = date.today().month
+
+    timesheets = TblTimeSheet.objects.raw('SELECT * FROM app_tbltimesheet WHERE EXTRACT(MONTH FROM Date) = %s' % last_month)
+
+    context = {
+        'title': 'Hours Report',
+        'timesheets': timesheets,
+
+    }
+
+    return render(request, 'srg_hours_report.html', context)
 
 
 def password_reset_request(request):

@@ -85,11 +85,11 @@ WSGI_APPLICATION = 'tdts.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'tdts',
-        'USER': 'postgres',
-        'PASSWORD': '~im12bnl8~',
-        'HOST': 'localhost',
-        'PORT': '5434'
+        'NAME': 'tande',
+        'USER': 'dbadmin',
+        'PASSWORD': 'R@nd@ll22',
+        'HOST': 'srgpostgresql.postgres.database.azure.com',
+        'PORT': '5432'
     }
 }
 

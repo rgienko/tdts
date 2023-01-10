@@ -7,15 +7,15 @@
     <div class="container-fluid mt-4">
         <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-center">
             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 rounded-4 text-start border">
-                <h2 class="display-4 fw-normal">{{ user.first_name }}'s Timesheet</h2>
-                <h4 class="fw-normal">Today: {{ today|date:'D m/d/Y' }}</h4>
-                <h4 class="fw-normal">Week: {{ week_beg|date:'D m/d/Y' }} - {{ week_end|date:'D m/d/Y' }}</h4>
+                <h2 class="display-5 fw-normal  text-white">{{ user.first_name }}'s Timesheet</h2>
+                <h4 class="fw-normal text-white">Today: {{ today|date:'D m/d/Y' }}</h4>
+                <h4 class="fw-normal text-white">Week: {{ week_beg|date:'D m/d/Y' }} - {{ week_end|date:'D m/d/Y' }}</h4>
             </div>
         </div>
         <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-between mt-4">
 
             <div class="col-xl-8 col-lg-8 col-md-12 col-sm-12 col-12 border rounded-2 pt-3">
-                <h4 class="text-center">Top Projects - Last 30 Days</h4>
+                <h4 class="text-center text-white">Top Projects - Last 30 Days</h4>
                 <table class="table table-small text-light">
                     <thead>
                         <tr>
@@ -39,11 +39,11 @@
 
             </div>
 
-            <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12 border rounded-2 pt-3">
-                <h4 class="text-center">Weekly Hours Total</h4>
-                <h1 class="display-1 text-center">{% if total_hours.sum_of_hours is None %}0.00{% else %}{{ total_hours.sum_of_hours }}{% endif %}</h1>
+            <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12 border rounded-2 pt-3 text-white">
+                <h4 class="text-center text-white">Weekly Hours Total</h4>
+                <h1 class="display-1 text-center text-white">{% if total_hours.sum_of_hours is None %}0.00{% else %}{{ total_hours.sum_of_hours }}{% endif %}</h1>
 
-                <h5 class="text-center">Breakdown</h5>
+                <h5 class="text-center text-white">Breakdown</h5>
                 <table class="table table-small text-light">
                     <thead>
                         <tr>
@@ -122,15 +122,15 @@
                                     <td>{{ rec.hours }}</td>
                                     <td class="text-start">{{ rec.type_id }}</td>
                                     <td>{{ rec.fye|date:'m/d/Y' }}</td>
-                                    <td class="text-start">{{ rec.note }}</td>
-                                    <td class="gap-2 d-flex justify-content-center align-items-middle"  style="min-width:150px;">
+                                    <td class="text-start" style="max-width:300px">{{ rec.note }}</td>
+                                    <td class="gap-2 d-flex justify-content-center align-items-middle border-0"  style="min-width:150px;">
                                         <a type="button" class="srg-success-button" href="{% url 'add-expense' rec.timesheet_id %}">
                                             <i class="bi bi-currency-dollar fs-5"></i>
                                         </a>
                                         <a type="button" class="srg-btn-primary-sm" href="{% url 'edit-timesheet' rec.timesheet_id %}">
                                             <i class="bi bi-pencil-square fs-5"></i>
                                         </a>
-                                        <a type="button" class="srg-danger-button" href="">
+                                        <a type="button" class="srg-danger-button" href="#">
                                            <i class="bi bi-trash fs-5"></i>
                                         </a>
                                     </td>

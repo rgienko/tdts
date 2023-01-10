@@ -133,6 +133,9 @@ class TblExpense(models.Model):
     def get_category(self):
         return self.expense_category_id.expense_category
 
+    def get_employee(self):
+        return self.timesheet_id.employee_id
+
 
 class TblToDoList(models.Model):
     todolist_id = models.AutoField(primary_key=True)
