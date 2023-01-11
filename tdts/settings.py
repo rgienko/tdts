@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'app',
     'crispy_forms',
-    'mathfilters'
+    'mathfilters',
+    'bootstrap_datepicker_plus'
 ]
 
 MIDDLEWARE = [

@@ -39,7 +39,7 @@
 
             </div>
 
-            <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12 border rounded-2 pt-3 text-white">
+            <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12 border rounded-2 pt-3 mt-md-4 text-white">
                 <h4 class="text-center text-white">Weekly Hours Total</h4>
                 <h1 class="display-1 text-center text-white">{% if total_hours.sum_of_hours is None %}0.00{% else %}{{ total_hours.sum_of_hours }}{% endif %}</h1>
 
@@ -79,7 +79,7 @@
 
 
 
-        <div class="d-flex flex-row flex-xl-nowrap flex-lg-wrap flex-md-wrap flex-sm-wrap srg-bg-secondary rounded-4 my-4 p-2 table-responsive-md" style="max-height:725px">
+        <div class="d-flex flex-row flex-xl-nowrap flex-lg-wrap flex-md-wrap flex-sm-wrap srg-bg-secondary rounded-4 my-4 p-2 table-responsive-md">
             <div class="srg-border flex-xl-grow-0 flex-md-grow-1 rounded-2 px-2 ">
                 <h4 class="text-start fs-2 py-2 fw-normal" style="border-bottom:1px solid #a9a9a9">Timesheet Form</h4>
                 <form class="" method="POST">
@@ -97,7 +97,8 @@
                     <a class="srg-link mx-3" href="{% url 'timesheet-bulk' %}">Bulk Form</a>
                 </form>
             </div>
-            <div class="flex-xl-grow-1 flex-lg-grow-1 flex-md-grow-1 px-2 srg-border ms-4 ">
+
+            <div class="flex-xl-grow-1 flex-lg-grow-1 flex-md-grow-1 px-2 srg-border ms-lg-4 mt-lg-0 mt-md-4 ">
                 <h4 class="text-start py-2 fw-normal fs-2" style="border-bottom:1px solid #a9a9a9">Current Week Timesheet</h4>
                 <div class="overflow-auto" style="max-height:625px">
                     <table class="table table-sm text-center table-bordered align-middle" style="border:1px solid #a9a9a9">

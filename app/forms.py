@@ -5,6 +5,7 @@ from . import widget
 from .models import *
 from .widget import *
 from django.utils.translation import gettext_lazy as _
+from bootstrap_datepicker_plus.widgets import DateTimePickerInput
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -65,6 +66,8 @@ class RegisterForm(forms.Form):
 
 
 class TimeSheetForm(forms.ModelForm):
+
+
     class Meta:
         model = TblTimeSheet
 
@@ -81,9 +84,10 @@ class TimeSheetForm(forms.ModelForm):
         }
 
         widgets = {
-            'date': DatePickerInput,
-            'fye': DatePickerInput,
-            'end': DatePickerInput,
+            'date': DatePickerInput(),
+            'fye': DatePickerInput(),
+            'fye': DatePickerInput(),
+            'end': DatePickerInput(),
             'note': forms.Textarea(attrs={'rows': 5, 'cols': 50})
         }
 

@@ -20,6 +20,8 @@ from django.utils.http import urlsafe_base64_encode
 from django.views.generic import TemplateView
 from itertools import chain
 
+from bootstrap_datepicker_plus.widgets import DateTimePickerInput
+
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
@@ -445,12 +447,14 @@ def analytics(request):
     thirty_timesheet = TblTimeSheet.objects.filter(
         date__lte=week_end).filter(date__gte=thirty).order_by('date')
 
-    top_projects = thirty_timesheet.values('provider_id', 'provider_id__provider_name', 'time_code', 'fye',
+    all_projects = TblTimeSheet.objects.all()
+
+    top_projects = all_projects.values('provider_id', 'provider_id__provider_name', 'time_code', 'fye',
                                            'time_code_id__time_code_description',
                                            'time_code_id__time_code_hours_budget').annotate(
         sum_of_project_hours=Sum('hours')).order_by('-sum_of_project_hours')
 
-    all_projects = TblTimeSheet.objects.all()
+
 
     labels = []
     data = []

@@ -8,15 +8,14 @@
 
 
     <link rel="stylesheet" href="{% static 'css/site.css' %}">
-    <div class="container-fluid mt-4">
-        <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-center">
-            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 rounded-4 text-center">
+    <div class="container-fluid mt-2">
+        <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-center ">
+            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 rounded-4 text-center position-static">
                 <h2 class="display-4 fw-normal">Projects Analysis</h2>
             </div>
         </div>
-        <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-between mt-4">
-
-            <div class="col-xxl-8 col-xl-9 col-lg-8 col-md-12 col-sm-12 col-12 pt-3 px-3" id="tab-content" id="nav-tabContent" role="tablist">
+        <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-between mt-2 position-static">
+            <div class=" overflow-auto col-xxl-8 col-xl-9 col-lg-8 col-md-12 col-sm-12 col-12 pt-3 px-3" style="max-height:750px" id="tab-content" id="nav-tabContent" role="tablist">
                 <div class="row border-bottom">
                     <div class="col-xxl-3 col-md-3 col-sm-3 text-center">
                         Provider
@@ -66,7 +65,7 @@
                 {% endfor %}
             </div>
 
-            <div class="col-xxl-4 col-xl-3 col-lg-4 col-md-4 col-sm-12 col-12">
+            <div class="col-xxl-4 col-xl-3 col-lg-4 col-md-12 col-sm-12 col-12">
                 <div class="tab-content" id="nav-tabContent">
                     {% for project in top_projects %}
                         <div class="tab-pane border rounded-2 pt-3 mt-md-2 {% if forloop.counter == 1 %}active{% else %}{% endif %}"
@@ -80,7 +79,7 @@
 
 
                             <div class="row mt-5">
-                                <div class="col-xxl-4 col-md-12 col-sm-3">
+                                <div class="col-xxl-4 col-md-3 col-sm-3">
                                     <h6 class="text-center mb-0">Hours Used</h6>
                                     <h4 class="display-5 text-center">
                                         {% if project.sum_of_project_hours is None %}
@@ -90,7 +89,7 @@
                                         {% endif %}
                                     </h4>
                                 </div>
-                                <div class="col-xxl-4 col-md-12 col-sm-3">
+                                <div class="col-xxl-4 col-md-3 col-sm-3">
                                     <h6 class="text-center mb-0">Budget</h6>
                                     <h4 class="display-5 text-center">
                                         {% if project.time_code_id__time_code_hours_budget is None %}
@@ -100,7 +99,7 @@
                                         {% endif %}
                                     </h4>
                                 </div>
-                                <div class="col-xxl-4 col-md-12 col-sm-3">
+                                <div class="col-xxl-4 col-md-3 col-sm-3">
                                     <h6 class="text-center mb-0">Available</h6>
                                     <h4 class="display-5 text-center">
                                         {% if project.hours_left is None %}
@@ -114,7 +113,7 @@
                                         {% endif %}
                                     </h4>
                                 </div>
-                                <div class="col-xxl-12 col-md-12 col-sm-3 mt-3">
+                                <div class="col-xxl-12 col-md-3 col-sm-3">
                                     <h6 class="text-center mb-0">Budget Used</h6>
                                     <h4 class="display-5 text-center">
                                         {% if project.percent_to_budget is None %}
