@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth import logout
 from django.conf import settings
 from django.core.mail import send_mail, BadHeaderError
 from django.db.models import Sum, Count
@@ -60,7 +61,7 @@ def register(request):
             new_user.last_name = last_name
             new_user.save()
 
-            return redirect('main')
+            return redirect('login')
         else:
             messages.error(request, 'Passwords do not match')
     else:
@@ -438,6 +439,7 @@ def analytics_detail(request, prov, tc, fy):
 
 
 def analytics(request):
+    global proj_emp
     today = date.today()
 
     week_beg = today - timedelta(days=today.weekday())
@@ -454,27 +456,32 @@ def analytics(request):
                                            'time_code_id__time_code_hours_budget').annotate(
         sum_of_project_hours=Sum('hours')).order_by('-sum_of_project_hours')
 
-
-
     labels = []
     data = []
     color = []
+    proj_dollars = []
+
 
     for item in top_projects:
         proj_emp = TblTimeSheet.objects.filter(provider_id=item['provider_id'], time_code=item['time_code'],
                                                fye=item['fye'])
-        proj_emp = proj_emp.values('employee_id', 'provider_id', 'time_code', 'fye',
+
+        proj_emp_agg = proj_emp.values('employee_id', 'provider_id', 'time_code', 'fye',
                                    'time_code_id__time_code_hours_budget').annotate(
             emp_sum_of_project_hours=Sum('hours')).order_by('-emp_sum_of_project_hours')
+
+
         item['proj_emp'] = proj_emp
+        item['proj_emp_agg'] = proj_emp_agg
         item['hours_left'] = item['time_code_id__time_code_hours_budget'] - item['sum_of_project_hours']
         item['percent_to_budget'] = round(
             (item['sum_of_project_hours'] / item['time_code_id__time_code_hours_budget'] * 100))
 
-    context = {'today': today, 'top_projects': top_projects, 'all_projects': all_projects, 'labels': labels,
-               'data': data}
 
-    return render(request, 'analytics.html', context)
+    context = {'today': today, 'top_projects': top_projects[:5], 'all_projects': all_projects, 'labels': labels,
+               'data': data, 'color': color}
+
+    return render(request, 'analytics_v2.html', context)
 
 
 @login_required()
@@ -532,9 +539,12 @@ def hoursReport(request):
 
     timesheets = TblTimeSheet.objects.raw('SELECT * FROM app_tbltimesheet WHERE EXTRACT(MONTH FROM Date) = %s' % last_month)
 
+    timesheets_by_engagment = TblTimeSheet.objects.raw('')
+
     context = {
         'title': 'Hours Report',
         'timesheets': timesheets,
+        'last_month': first - timedelta(days=1)
 
     }
 
@@ -578,7 +588,7 @@ def password_reset_request(request):
                                      + 'The Website Team'
                     )
                     try:
-                        sg = SendGridAPIClient(settings.SENDGRID_KEY)
+                        sg = SendGridAPIClient(os.environ.get('SENDGRID_KEY'))
                         response = sg.send(message)
                         print(response.status_code)
                         print(response.body)

@@ -11,10 +11,10 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import os
 from pathlib import Path
-# import environ
+import environ
 # Initialise environment variables
-# env = environ.Env()
-# environ.Env.read_env()
+env = environ.Env()
+environ.Env.read_env()
 
 # SENDGRID_KEY = env('SENDGRID_KEY')
 
@@ -25,7 +25,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-aer$0tm1$w#h^ag!x9$+uu_x1x&fj&ketu86lieo#ir6(6&61q'
+# SECRET_KEY = 'django-insecure-aer$0tm1$w#h^ag!x9$+uu_x1x&fj&ketu86lieo#ir6(6&61q'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -86,9 +87,9 @@ WSGI_APPLICATION = 'tdts.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'tande',
-        'USER': 'dbadmin',
-        'PASSWORD': 'R@nd@ll22',
+        'NAME': env('DB_NAME'),
+        'USER': env('DB_USER'),
+        'PASSWORD': env('DB_PASS'),
         'HOST': 'srgpostgresql.postgres.database.azure.com',
         'PORT': '5432'
     }
@@ -136,4 +137,4 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-LOGIN_URL = '/'
+LOGIN_URL = '/login/'

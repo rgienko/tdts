@@ -11,6 +11,10 @@
     color: #02308C
 }
 
+.srg-header-secondary {
+    color: #d9d9d9
+}
+
 .srg-border {
     border: 1px solid #a9a9a9;
     border-radius: 12px;
@@ -22,6 +26,14 @@
 
 .srg-btn-primary {
     background-color: #02308C;
+    border: 1px solid #02308C;
+    color: #ffffff;
+    padding: 8px 16px 8px 16px;
+    border-radius: 12px;
+}
+
+.srg-btn-ol-primary {
+    background-color: #d9d9d9;
     border: 1px solid #02308C;
     color: #ffffff;
     padding: 8px 16px 8px 16px;

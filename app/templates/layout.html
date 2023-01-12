@@ -45,8 +45,47 @@
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            {% if user.is_staff %}
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="my-list navbar-nav me-auto mb-2 mb-lg-0" data-bs-toggle="list">
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="true"  href="{% url 'timesheet' %}">My Timesheet</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="false" href="{% url 'todolist' %}">My To-Do List</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="false" href="{% url 'my-expense' %}">My Expenses</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'analytics' %}">Analytics</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'comparison' %}">Comparison</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'srg-hours' %}">SRG Hours Report</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'srg-expense' %}">SRG Expense Report</a>
+                        </li>
+                    </ul>
+                    {% if user.is_authenticated %}
+                        <div class="btn-group">
+                            <a type="button" class="srg-link dropdown-toggle" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
+                                {{ user.first_name.0 }}{{ user.last_name.0}}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-lg-end dropdown-menu-md-start">
+                                <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                                <li><a class="dropdown-item" href="#">Change Password</a></li>
+                              </ul>
+                        </div>
+                    {% else %}
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="my-list navbar-nav me-auto mb-2 mb-lg-0" data-bs-toggle="list">
                     <li class="nav-item">
                         <a class="nav-link" aria-current="true"  href="{% url 'timesheet' %}">My Timesheet</a>
@@ -57,25 +96,23 @@
                     <li class="nav-item">
                         <a class="nav-link" aria-current="false" href="{% url 'my-expense' %}">My Expenses</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'analytics' %}">Analytics</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'comparison' %}">Comparison</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'srg-hours' %}">SRG Hours Report</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'srg-expense' %}">SRG Expense Report</a>
-                    </li>
                 </ul>
                 {% if user.is_authenticated %}
-                    {{ user.first_name.0 }}{{ user.last_name.0}}
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
+                            {{ user.first_name.0 }}{{ user.last_name.0}}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-lg-end dropdown-menu-md-start">
+                            <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                            <li><a class="dropdown-item" href="#">Change Password</a></li>
+                          </ul>
+                    </div>
                 {% else %}
                     <a class="nav-link" href="{% url 'login' %}">Login</a>
                 {% endif %}
             </div>
+            {% endif %}
+
         </div>
     </nav>
     <div class="container-fluid">
