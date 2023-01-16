@@ -37,6 +37,8 @@ urlpatterns = [
     path('comparison/', views.comparison, name='comparison'),
     path('srg-expense-report/', views.SRGExpenseReport, name='srg-expense'),
     path('srg-hours-report/', views.hoursReport, name='srg-hours'),
+    path('srg-hours-report/dl/<dt>/', views.extractHoursReport, name='dl-srg-hours'),
+    path('emp-billable-hours-compliation/', views.billableHoursCompilation, name='emp-hours-comp'),
     # path('accounts/', include('django.contrib.auth.urls')),
     path('password_reset/', views.password_reset_request, name="password_reset"),
     path('admin/', admin.site.urls),

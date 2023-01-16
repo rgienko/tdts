@@ -1,0 +1,56 @@
+{% extends 'layout.html' %}
+{% load crispy_forms_filters %}
+
+{% block content %}
+    {% load humanize %}
+    {% load crispy_forms_tags %}
+    <div class="container-fluid mt-4">
+
+        <div class="row srg-bg-secondary rounded-4 my-4 p-2 py-2 table-responsive-md d-flex justify-content-between">
+            <div class="d-flex justify-content-between" style="border-bottom: 1px solid #a9a9a9">
+                <h4 class="text-start fs-2 fw-normal srg-header">Employee Billable Hours Report <br> {{ last_month|date:'F Y' }}</h4>
+                <a class="text-decoration-none" href="#"><h4 class="srg-header fs-2 fw-normal"><i class="bi bi-save"></i></h4></a>
+            </div>
+
+            <table class="table table-sm table-bordered srg-border align-middle mt-3">
+                <thead>
+                    <tr class="text-center srg-bg-primary text-white border-0">
+                        <th class="fw-semibold border-0">Employee</th>
+                        <th class="fw-semibold border-0">Fixed</th>
+                        <th class="fw-semibold border-0">Hourly</th>
+                        <th class="fw-semibold border-0">Contingency</th>
+                        <th class="fw-semibold border-0">Non-Billable</th>
+                        <th class="fw-semibold border-0">Total</th>
+                        <th class="fw-semibold border-0">% Billable</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in compilation %}
+                        <tr>
+                            <td>{{ entry.employee_id }}</td>
+                            <td class="text-center">{% if entry.fhours.fhours_sum == 0%}-{% else %}{{ entry.fhours.fhours_sum }}{% endif %}</td>
+                            <td class="text-center">{% if entry.hhours.hhours_sum == 0 %}-{% else %}{{ entry.hhours.hhours_sum }}{% endif %}</td>
+                            <td class="text-center">{% if entry.chours.chours_sum == 0 %}-{% else %}{{ entry.chours.chours_sum }}{% endif %}</td>
+                            <td class="text-center">{% if entry.nhours.nhours_sum == 0 %}-{% else %}{{ entry.nhours.nhours_sum }}{% endif %}</td>
+                            <td class="text-center">{% if entry.total_hours.total_hours_sum == 0 %}-{% else %}{{ entry.total_hours.total_hours_sum }}{% endif %}</td>
+                            <td class="text-center">{{ entry.billability }}</td>
+                        </tr>
+
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td class="fw-semibold">Total:</td>
+                        <td class="fw-semibold">{{ srg_total_fhours.srg_fhours_sum }}</td>
+                        <td class="fw-semibold">{{ srg_total_hhours.srg_hhours_sum }}</td>
+                        <td class="fw-semibold">{{ srg_total_chours.srg_chours_sum }}</td>
+                        <td class="fw-semibold">{{ srg_total_nhours.srg_nhours_sum }}</td>
+                        <td class="fw-semibold">{{ srg_total_hours }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+
+
+        </div>
+    </div>
+{% endblock %}

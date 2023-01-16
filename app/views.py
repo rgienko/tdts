@@ -19,6 +19,9 @@ from django.urls import reverse_lazy
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.views.generic import TemplateView
+import pandas
+import xlsxwriter
+from django_pandas.io import read_frame
 from itertools import chain
 
 from bootstrap_datepicker_plus.widgets import DateTimePickerInput
@@ -246,6 +249,8 @@ class TimesheetView(PermissionRequiredMixin, TemplateView):
     week_end = week_beg + timedelta(days=5)
     thirty = date.today() - timedelta(days=30)
 
+
+
     def get(self, *args, **kwargs):
         # formset = TimeSheetFormSet(queryset=TblTimeSheet.objects.none(),
         #                          initial=[{'employee_id': self.request.user.username}])
@@ -437,9 +442,8 @@ def analytics_detail(request, prov, tc, fy):
 
     return render(request, 'analytics_detail.html', context)
 
-
+@login_required()
 def analytics(request):
-    global proj_emp
     today = date.today()
 
     week_beg = today - timedelta(days=today.weekday())
@@ -486,9 +490,6 @@ def analytics(request):
 
 @login_required()
 def comparison(request):
-    today = date.today()
-
-    timesheet_list = TblTimeSheet.objects.all()
 
     # employee_timesheet = TblTimeSheet.objects.filter(employee_id=request.user.username)
     employee_timesheet = TblTimeSheet.objects.all()
@@ -520,7 +521,6 @@ def comparison(request):
     timesheet_filter = TimeSheetFilter(request.GET, queryset=employee_timesheet_projects)
 
     context = {
-        'user': request.user.username,
         'employee_timesheet_projects': employee_timesheet_projects,
         'employee_todolist_projects': employee_todolist_projects,
         'comparison_projects': comparison_projects,
@@ -530,6 +530,79 @@ def comparison(request):
     return render(request, 'comparison.html', context)
 
 
+@login_required()
+def billableHoursCompilation(request):
+    today = date.today()
+    first = today.replace(day=1)
+    last_month = first - timedelta(days=1)
+
+    last_month_ts = TblTimeSheet.objects.filter(date__year=str(last_month.year)).filter(date__month=str(last_month.month)).order_by('employee_id')
+
+    emps = TblEmployee.objects.all().order_by('employee_id')
+    compilation = []
+
+    for emp in emps:
+        emp_last_month_ts = last_month_ts.filter(employee_id=emp.employee_id)
+        fhours = emp_last_month_ts.filter(type_id='F').aggregate(fhours_sum=Sum('hours'))
+
+        hhours = emp_last_month_ts.filter(type_id='H').aggregate(hhours_sum=Sum('hours'))
+        chours = emp_last_month_ts.filter(type_id='C').aggregate(chours_sum=Sum('hours'))
+        nhours = emp_last_month_ts.filter(type_id='N').aggregate(nhours_sum=Sum('hours'))
+
+        if fhours['fhours_sum'] is None:
+            fhours['fhours_sum'] = 0
+
+        if hhours['hhours_sum'] is None:
+            hhours['hhours_sum'] = 0
+
+        if chours['chours_sum'] is None:
+            chours['chours_sum'] = 0
+
+        if nhours['nhours_sum'] is None:
+            nhours['nhours_sum'] = 0
+
+        total_hours = emp_last_month_ts.aggregate(total_hours_sum=Sum('hours'))
+
+        if total_hours['total_hours_sum'] is None:
+            total_hours['total_hours_sum'] = 0
+            billability = 0
+        else:
+
+            billable_hours = total_hours['total_hours_sum'] - nhours['nhours_sum']
+
+            billability = round((billable_hours / total_hours['total_hours_sum']) * 100)
+
+
+        employee_dict = {'employee_id': emp,
+                         'fhours': fhours,
+                         'hhours': hhours,
+                         'chours': chours,
+                         'nhours': nhours,
+                         'total_hours': total_hours,
+                         'billability': billability
+                         }
+        print(employee_dict)
+        compilation.append(employee_dict)
+
+    srg_total_fhours = last_month_ts.filter(type_id='F').aggregate(srg_fhours_sum=Sum('hours'))
+    srg_total_hhours = last_month_ts.filter(type_id='H').aggregate(srg_hhours_sum=Sum('hours'))
+    srg_total_chours = last_month_ts.filter(type_id='C').aggregate(srg_chours_sum=Sum('hours'))
+    srg_total_nhours = last_month_ts.filter(type_id='N').aggregate(srg_nhours_sum=Sum('hours'))
+    srg_total_hours = srg_total_fhours['srg_fhours_sum'] + srg_total_hhours['srg_hhours_sum'] + srg_total_chours['srg_chours_sum'] + srg_total_nhours['srg_nhours_sum']
+
+    context = {'compilation': compilation,
+               'last_month': last_month,
+               'srg_total_fhours': srg_total_fhours,
+               'srg_total_hhours': srg_total_hhours,
+               'srg_total_chours': srg_total_chours,
+               'srg_total_nhours': srg_total_nhours,
+               'srg_total_hours': srg_total_hours
+               }
+    return render(request, 'emp_hours_comp.html', context)
+
+
+
+@login_required()
 def hoursReport(request):
     today = date.today()
     first = today.replace(day=1)
@@ -537,7 +610,7 @@ def hoursReport(request):
     last_month = last_month.month
     month = date.today().month
 
-    timesheets = TblTimeSheet.objects.raw('SELECT * FROM app_tbltimesheet WHERE EXTRACT(MONTH FROM Date) = %s' % last_month)
+    timesheets = TblTimeSheet.objects.raw('SELECT * FROM app_tbltimesheet WHERE EXTRACT(MONTH FROM Date) = %s ORDER BY employee_id_id' % last_month)
 
     timesheets_by_engagment = TblTimeSheet.objects.raw('')
 
@@ -551,6 +624,29 @@ def hoursReport(request):
     return render(request, 'srg_hours_report.html', context)
 
 
+@login_required()
+def extractHoursReport(request, dt):
+    print(dt)
+    date_time_obj = datetime.strptime(dt, '%Y-%m-%d')
+    ts_month = date_time_obj.month
+    ts_year = date_time_obj.year
+    print(ts_month)
+    print(ts_year)
+
+    ts = TblTimeSheet.objects.filter(date__year=ts_year).filter(date__month=ts_month)
+
+
+    ts_data = read_frame(ts)
+
+    fname = 'Hours Report~' + str(ts_month) +" "+ str(ts_year)
+
+    response = HttpResponse(content_type='application/vns.ms-excel')
+    response['Content-Disposition'] = 'attachment; filename=' + fname + '.xlsx'
+    with pandas.ExcelWriter(response, engine='xlsxwriter') as writer:
+        ts_data.to_excel(writer, sheet_name=(str(ts_month) +" "+ str(ts_year)), index=False, header=True)
+        # df_hfy.to_excel(writer, sheet_name=('PFY ' + fye), index=False, header=True)
+
+        return response
 def password_reset_request(request):
     if request.method == "POST":
         password_reset_form = PasswordResetForm(request.POST)

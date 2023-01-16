@@ -48,7 +48,8 @@
 
 
 .srg-link {
-    color: #02308C
+    color: #02308C;
+    text-decoration: none;
 }
 
 .srg-btn-primary:hover {
