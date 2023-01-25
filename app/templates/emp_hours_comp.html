@@ -9,7 +9,12 @@
         <div class="row srg-bg-secondary rounded-4 my-4 p-2 py-2 table-responsive-md d-flex justify-content-between">
             <div class="d-flex justify-content-between" style="border-bottom: 1px solid #a9a9a9">
                 <h4 class="text-start fs-2 fw-normal srg-header">Employee Billable Hours Report <br> {{ last_month|date:'F Y' }}</h4>
-                <a class="text-decoration-none" href="#"><h4 class="srg-header fs-2 fw-normal"><i class="bi bi-save"></i></h4></a>
+                <form method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="text-decoration-none" href="#" name="excel_extract"><i class="bi bi-save"> Excel</i></button>
+                    <button type="submit" class="text-decoration-none" href="#" name="pdf_extract"><i class="bi bi-save"> PDF</i></button>
+                </form>
+
             </div>
 
             <table class="table table-sm table-bordered srg-border align-middle mt-3">
@@ -27,13 +32,13 @@
                 <tbody>
                     {% for entry in compilation %}
                         <tr>
-                            <td>{{ entry.employee_id }}</td>
-                            <td class="text-center">{% if entry.fhours.fhours_sum == 0%}-{% else %}{{ entry.fhours.fhours_sum }}{% endif %}</td>
-                            <td class="text-center">{% if entry.hhours.hhours_sum == 0 %}-{% else %}{{ entry.hhours.hhours_sum }}{% endif %}</td>
-                            <td class="text-center">{% if entry.chours.chours_sum == 0 %}-{% else %}{{ entry.chours.chours_sum }}{% endif %}</td>
-                            <td class="text-center">{% if entry.nhours.nhours_sum == 0 %}-{% else %}{{ entry.nhours.nhours_sum }}{% endif %}</td>
-                            <td class="text-center">{% if entry.total_hours.total_hours_sum == 0 %}-{% else %}{{ entry.total_hours.total_hours_sum }}{% endif %}</td>
-                            <td class="text-center">{{ entry.billability }}</td>
+                            <td style="width: 150px">{{ entry.employee_id }}</td>
+                            <td class="text-center" style="width: 150px">{% if entry.fhours == 0%}-{% else %}{{ entry.fhours }}{% endif %}</td>
+                            <td class="text-center" style="width: 150px">{% if entry.hhours == 0 %}-{% else %}{{ entry.hhours }}{% endif %}</td>
+                            <td class="text-center" style="width: 150px">{% if entry.chours == 0 %}-{% else %}{{ entry.chours }}{% endif %}</td>
+                            <td class="text-center" style="width: 150px">{% if entry.nhours == 0 %}-{% else %}{{ entry.nhours }}{% endif %}</td>
+                            <td class="text-center" style="width: 150px">{% if entry.total_hours == 0 %}-{% else %}{{ entry.total_hours }}{% endif %}</td>
+                            <td class="text-center" style="width: 150px">{% if entry.billability == 0 %}-{% else %}{{ entry.billability }}{% endif %}</td>
                         </tr>
 
                     {% endfor %}
@@ -41,11 +46,11 @@
                 <tfoot>
                     <tr>
                         <td class="fw-semibold">Total:</td>
-                        <td class="fw-semibold">{{ srg_total_fhours.srg_fhours_sum }}</td>
-                        <td class="fw-semibold">{{ srg_total_hhours.srg_hhours_sum }}</td>
-                        <td class="fw-semibold">{{ srg_total_chours.srg_chours_sum }}</td>
-                        <td class="fw-semibold">{{ srg_total_nhours.srg_nhours_sum }}</td>
-                        <td class="fw-semibold">{{ srg_total_hours }}</td>
+                        <td class="fw-semibold text-center">{{ srg_total_fhours.srg_fhours_sum }}</td>
+                        <td class="fw-semibold text-center">{{ srg_total_hhours.srg_hhours_sum }}</td>
+                        <td class="fw-semibold text-center">{{ srg_total_chours.srg_chours_sum }}</td>
+                        <td class="fw-semibold text-center">{{ srg_total_nhours.srg_nhours_sum }}</td>
+                        <td class="fw-semibold text-center">{{ srg_total_hours }}</td>
                     </tr>
                 </tfoot>
             </table>

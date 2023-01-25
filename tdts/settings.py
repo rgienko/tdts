@@ -91,7 +91,7 @@ DATABASES = {
         'USER': env('DB_USER'),
         'PASSWORD': env('DB_PASS'),
         'HOST': 'srgpostgresql.postgres.database.azure.com',
-        'PORT': '5432'
+        # 'PORT': '5432'
     }
 }
 

@@ -1,7 +1,10 @@
+import calendar
 import os
 import random
 from datetime import date, timedelta, datetime
+from io import BytesIO
 
+import numpy
 from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordResetForm
@@ -25,6 +28,10 @@ from django_pandas.io import read_frame
 from itertools import chain
 
 from bootstrap_datepicker_plus.widgets import DateTimePickerInput
+from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import cm
 
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
@@ -32,6 +39,12 @@ from sendgrid.helpers.mail import Mail
 from .filters import TimeSheetFilter
 from .forms import *
 from .models import *
+
+from reportlab.pdfgen import canvas
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfbase import pdfmetrics
+from reportlab.lib import colors
+from reportlab.platypus import *
 
 
 # Create your views here.
@@ -249,8 +262,6 @@ class TimesheetView(PermissionRequiredMixin, TemplateView):
     week_end = week_beg + timedelta(days=5)
     thirty = date.today() - timedelta(days=30)
 
-
-
     def get(self, *args, **kwargs):
         # formset = TimeSheetFormSet(queryset=TblTimeSheet.objects.none(),
         #                          initial=[{'employee_id': self.request.user.username}])
@@ -442,6 +453,7 @@ def analytics_detail(request, prov, tc, fy):
 
     return render(request, 'analytics_detail.html', context)
 
+
 @login_required()
 def analytics(request):
     today = date.today()
@@ -456,8 +468,8 @@ def analytics(request):
     all_projects = TblTimeSheet.objects.all()
 
     top_projects = all_projects.values('provider_id', 'provider_id__provider_name', 'time_code', 'fye',
-                                           'time_code_id__time_code_description',
-                                           'time_code_id__time_code_hours_budget').annotate(
+                                       'time_code_id__time_code_description',
+                                       'time_code_id__time_code_hours_budget').annotate(
         sum_of_project_hours=Sum('hours')).order_by('-sum_of_project_hours')
 
     labels = []
@@ -465,22 +477,19 @@ def analytics(request):
     color = []
     proj_dollars = []
 
-
     for item in top_projects:
         proj_emp = TblTimeSheet.objects.filter(provider_id=item['provider_id'], time_code=item['time_code'],
                                                fye=item['fye'])
 
         proj_emp_agg = proj_emp.values('employee_id', 'provider_id', 'time_code', 'fye',
-                                   'time_code_id__time_code_hours_budget').annotate(
+                                       'time_code_id__time_code_hours_budget').annotate(
             emp_sum_of_project_hours=Sum('hours')).order_by('-emp_sum_of_project_hours')
-
 
         item['proj_emp'] = proj_emp
         item['proj_emp_agg'] = proj_emp_agg
         item['hours_left'] = item['time_code_id__time_code_hours_budget'] - item['sum_of_project_hours']
         item['percent_to_budget'] = round(
             (item['sum_of_project_hours'] / item['time_code_id__time_code_hours_budget'] * 100))
-
 
     context = {'today': today, 'top_projects': top_projects[:5], 'all_projects': all_projects, 'labels': labels,
                'data': data, 'color': color}
@@ -490,7 +499,6 @@ def analytics(request):
 
 @login_required()
 def comparison(request):
-
     # employee_timesheet = TblTimeSheet.objects.filter(employee_id=request.user.username)
     employee_timesheet = TblTimeSheet.objects.all()
     employee_timesheet_projects = employee_timesheet.values('employee_id', 'provider_id', 'provider_id__provider_name',
@@ -536,15 +544,15 @@ def billableHoursCompilation(request):
     first = today.replace(day=1)
     last_month = first - timedelta(days=1)
 
-    last_month_ts = TblTimeSheet.objects.filter(date__year=str(last_month.year)).filter(date__month=str(last_month.month)).order_by('employee_id')
+    last_month_ts = TblTimeSheet.objects.filter(date__year=str(last_month.year)).filter(
+        date__month=str(last_month.month)).order_by('employee_id')
 
-    emps = TblEmployee.objects.all().order_by('employee_id')
+    employees = TblEmployee.objects.all().order_by('employee_id')
     compilation = []
 
-    for emp in emps:
+    for emp in employees:
         emp_last_month_ts = last_month_ts.filter(employee_id=emp.employee_id)
         fhours = emp_last_month_ts.filter(type_id='F').aggregate(fhours_sum=Sum('hours'))
-
         hhours = emp_last_month_ts.filter(type_id='H').aggregate(hhours_sum=Sum('hours'))
         chours = emp_last_month_ts.filter(type_id='C').aggregate(chours_sum=Sum('hours'))
         nhours = emp_last_month_ts.filter(type_id='N').aggregate(nhours_sum=Sum('hours'))
@@ -572,23 +580,124 @@ def billableHoursCompilation(request):
 
             billability = round((billable_hours / total_hours['total_hours_sum']) * 100)
 
-
         employee_dict = {'employee_id': emp,
-                         'fhours': fhours,
-                         'hhours': hhours,
-                         'chours': chours,
-                         'nhours': nhours,
-                         'total_hours': total_hours,
+                         'fhours': int(fhours['fhours_sum']),
+                         'hhours': int(hhours['hhours_sum']),
+                         'chours': int(chours['chours_sum']),
+                         'nhours': int(nhours['nhours_sum']),
+                         'total_hours': int(total_hours['total_hours_sum']),
                          'billability': billability
                          }
-        print(employee_dict)
+
         compilation.append(employee_dict)
 
     srg_total_fhours = last_month_ts.filter(type_id='F').aggregate(srg_fhours_sum=Sum('hours'))
+
     srg_total_hhours = last_month_ts.filter(type_id='H').aggregate(srg_hhours_sum=Sum('hours'))
+
     srg_total_chours = last_month_ts.filter(type_id='C').aggregate(srg_chours_sum=Sum('hours'))
+
     srg_total_nhours = last_month_ts.filter(type_id='N').aggregate(srg_nhours_sum=Sum('hours'))
-    srg_total_hours = srg_total_fhours['srg_fhours_sum'] + srg_total_hhours['srg_hhours_sum'] + srg_total_chours['srg_chours_sum'] + srg_total_nhours['srg_nhours_sum']
+
+    srg_total_hours = last_month_ts.aggregate(srg_total_hours_sum=Sum('hours'))
+
+    if request.method == 'POST' and 'excel_extract' in request.POST:
+        df = pandas.DataFrame(compilation)
+        # compilation_data = read_frame(df)
+        fname = 'Employee Hours Compilation Report~' + str(last_month.month) + " " + str(last_month.year)
+
+        response = HttpResponse(content_type='application/vns.ms-excel')
+        response['Content-Disposition'] = 'attachment; filename=' + fname + '.xlsx'
+        with pandas.ExcelWriter(response, engine='xlsxwriter') as writer:
+            df.to_excel(writer, sheet_name=(str(last_month.month) + " " + str(last_month.year)),
+                        index=False, header=True)
+            # df_hfy.to_excel(writer, sheet_name=('PFY ' + fye), index=False, header=True)
+            return response
+
+    elif request.method == 'POST' and 'pdf_extract' in request.POST:
+        fname = 'Employee Hours Compilation Report~' + calendar.month_name[last_month.month] + " " + str(
+            last_month.year)
+        documentTitleLineOne = 'Employee Billable Hours Report'
+        documentTitleLineTwo = (str(last_month.month) + " " + str(last_month.year))
+
+        elements = []
+
+        styles = getSampleStyleSheet()
+        styles.add(ParagraphStyle(name='Justify', alignment=TA_LEFT))
+
+        titleOne = '<font size="24">Employee Billable Hours Compilation</font>'
+        titleTwo = '<font size="24">' + calendar.month_name[last_month.month] + " " + str(last_month.year) + '</font>'
+
+        elements.append(Paragraph(titleOne, styles['Normal']))
+        elements.append(Spacer(1, 12))
+        elements.append(Paragraph(titleTwo, styles['Normal']))
+        elements.append(Spacer(1, 48))
+
+        df = pandas.DataFrame(compilation)
+
+        columnHeaderEmployee = Paragraph('<para align=center>Employee</para>', styles["Normal"])
+        columnHeaderF = Paragraph('<para align=center>Fixed-Fee</para>', styles["Normal"])
+        columnHeaderH = Paragraph('<para align=center>Hourly</para>', styles["Normal"])
+        columnHeaderC = Paragraph('<para align=center>Contingency</para>', styles["Normal"])
+        columnHeaderN = Paragraph('<para align=center>Non-Billable</para>', styles["Normal"])
+        columnHeaderT = Paragraph('<para align=center>Total</para>', styles["Normal"])
+        columnHeaderBillable = Paragraph('<para align=center>% Billable</para>', styles["Normal"])
+
+        pdfStory = [[columnHeaderEmployee, columnHeaderF, columnHeaderH, columnHeaderC,
+                     columnHeaderN, columnHeaderT, columnHeaderBillable]]
+
+        for row in compilation:
+            employee = row['employee_id']
+            columnFdata = row['fhours']
+            columnHdata = row['hhours']
+            columnCdata = row['chours']
+            columnNdata = row['nhours']
+            columnTdata = row['total_hours']
+            columnBillable = row['billability']
+
+            pdfStory.append([employee, columnFdata, columnHdata, columnCdata,
+                        columnNdata, columnTdata, columnBillable])
+
+        total = "Total:"
+
+        fhours = srg_total_fhours['srg_fhours_sum']
+        thhours = srg_total_hhours['srg_hhours_sum']
+        chours = srg_total_chours['srg_chours_sum']
+        nhours = srg_total_nhours['srg_nhours_sum']
+        srg_total = srg_total_hours['srg_total_hours_sum']
+
+        pdfStory.append([
+            total,
+            fhours,
+            thhours,
+            chours,
+            nhours,
+            srg_total
+        ])
+
+        t1 = Table(pdfStory)
+        t1.setStyle(TableStyle(
+            [
+                ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
+                # ('GRID', (0, 1), (-1, -1), 0.25, colors.black),
+                ('ALIGN', (1, 0), (-1, -1), 'RIGHT'),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.blue),
+                # ('BACKGROUND', (0, 0), (-1, 0), colors.blue),
+            ]
+        ))
+        elements.append(t1)
+
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer, pageSize=letter, leftMargin=1 * cm, topMargin=1 * cm, bottomMargin=.5)
+        doc.build(elements)
+        pdf_value = buffer.getvalue()
+        buffer.close()
+
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename={}'.format(fname)
+
+        response.write(pdf_value)
+        return response
 
     context = {'compilation': compilation,
                'last_month': last_month,
@@ -596,10 +705,30 @@ def billableHoursCompilation(request):
                'srg_total_hhours': srg_total_hhours,
                'srg_total_chours': srg_total_chours,
                'srg_total_nhours': srg_total_nhours,
-               'srg_total_hours': srg_total_hours
+               'srg_total_hours': srg_total_hours['srg_total_hours_sum']
                }
     return render(request, 'emp_hours_comp.html', context)
 
+
+@login_required()
+def extractBillableHoursCompilation(request, dt):
+    date_time_obj = datetime.strptime(dt, '%Y-%m-%d')
+    ts_month = date_time_obj.month
+    ts_year = date_time_obj.year
+
+    ts = TblTimeSheet.objects.filter(date__year=ts_year).filter(date__month=ts_month)
+
+    ts_data = read_frame(ts)
+
+    fname = 'Hours Report~' + str(ts_month) + " " + str(ts_year)
+
+    response = HttpResponse(content_type='application/vns.ms-excel')
+    response['Content-Disposition'] = 'attachment; filename=' + fname + '.xlsx'
+    with pandas.ExcelWriter(response, engine='xlsxwriter') as writer:
+        ts_data.to_excel(writer, sheet_name=(str(ts_month) + " " + str(ts_year)), index=False, header=True)
+        # df_hfy.to_excel(writer, sheet_name=('PFY ' + fye), index=False, header=True)
+
+        return response
 
 
 @login_required()
@@ -607,12 +736,9 @@ def hoursReport(request):
     today = date.today()
     first = today.replace(day=1)
     last_month = first - timedelta(days=1)
-    last_month = last_month.month
     month = date.today().month
 
-    timesheets = TblTimeSheet.objects.raw('SELECT * FROM app_tbltimesheet WHERE EXTRACT(MONTH FROM Date) = %s ORDER BY employee_id_id' % last_month)
-
-    timesheets_by_engagment = TblTimeSheet.objects.raw('')
+    timesheets = TblTimeSheet.objects.filter(date__year=last_month.year).filter(date__month=last_month.month)
 
     context = {
         'title': 'Hours Report',
@@ -626,27 +752,25 @@ def hoursReport(request):
 
 @login_required()
 def extractHoursReport(request, dt):
-    print(dt)
     date_time_obj = datetime.strptime(dt, '%Y-%m-%d')
     ts_month = date_time_obj.month
     ts_year = date_time_obj.year
-    print(ts_month)
-    print(ts_year)
 
     ts = TblTimeSheet.objects.filter(date__year=ts_year).filter(date__month=ts_month)
 
-
     ts_data = read_frame(ts)
 
-    fname = 'Hours Report~' + str(ts_month) +" "+ str(ts_year)
+    fname = 'Hours Report~' + str(ts_month) + " " + str(ts_year)
 
     response = HttpResponse(content_type='application/vns.ms-excel')
     response['Content-Disposition'] = 'attachment; filename=' + fname + '.xlsx'
     with pandas.ExcelWriter(response, engine='xlsxwriter') as writer:
-        ts_data.to_excel(writer, sheet_name=(str(ts_month) +" "+ str(ts_year)), index=False, header=True)
+        ts_data.to_excel(writer, sheet_name=(str(ts_month) + " " + str(ts_year)), index=False, header=True)
         # df_hfy.to_excel(writer, sheet_name=('PFY ' + fye), index=False, header=True)
 
         return response
+
+
 def password_reset_request(request):
     if request.method == "POST":
         password_reset_form = PasswordResetForm(request.POST)
