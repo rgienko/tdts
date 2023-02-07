@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
@@ -52,6 +54,10 @@ class TblEmployee(models.Model):
 class TblParent(models.Model):
     parent_id = models.CharField(max_length=15, primary_key=True)
     parent_name = models.CharField(max_length=100)
+
+
+    class Meta:
+        ordering = ['parent_id']
 
     def __str__(self):
         return self.parent_id
@@ -151,3 +157,44 @@ class TblToDoList(models.Model):
 
     def get_providername(self):
         return self.provider_id.provider_name
+
+
+class TblEngagements(models.Model):
+    engagement_id = models.AutoField(primary_key=True)
+    srg_id = models.CharField(max_length=20)
+    start_date = models.DateField()
+    # target_end_date = models.DateField()
+    fye = models.DateField(null=True, blank=True)
+    budget_amount = models.IntegerField(null=True, default=10000)
+    budget_hours = models.IntegerField(default=120)
+    is_complete = models.BooleanField(default=False)
+    complete_date = models.DateField(blank=True, default=date.today)
+    parent = models.ForeignKey(TblParent, on_delete=models.CASCADE)
+    provider = models.ForeignKey(TblProvider, on_delete=models.CASCADE)
+    time_code = models.ForeignKey(TblTimeCode, on_delete=models.CASCADE)
+    type = models.ForeignKey(TblTypes, on_delete=models.CASCADE)
+    proj_manager = models.ForeignKey(User, related_name='manager', on_delete=models.CASCADE, null=True, blank=True)
+    employee = models.ForeignKey(TblEmployee, related_name='employee', db_column='employee_id', on_delete=models.CASCADE, default='')
+
+    def __str__(self):
+        return self.srg_id
+
+    def getProviderName(self):
+        return self.provider.provider_name
+
+    def getParentName(self):
+        return self.parent.parent_name
+
+
+class TblTime(models.Model):
+    timesheet_id = models.AutoField(primary_key=True)
+    # expense_id = models.ForeignKey(TblExpense, on_delete=models.CASCADE, null=True, blank=True)
+    employee = models.ForeignKey(TblEmployee, on_delete=models.CASCADE)
+    engagement = models.ForeignKey(TblEngagements, db_column='srg_id', on_delete=models.CASCADE)
+    date = models.DateField()
+    # provider_id = models.ForeignKey(TblProvider, on_delete=models.CASCADE)
+    # time_code = models.ForeignKey(TblTimeCode, on_delete=models.CASCADE)
+    hours = models.DecimalField(max_digits=4, decimal_places=2)
+    # type_id = models.ForeignKey(TblTypes, on_delete=models.CASCADE)
+    # fye = models.DateField(null=True, blank=True)
+    note = models.TextField(max_length=500, null=True, blank=True)

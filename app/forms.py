@@ -92,6 +92,21 @@ class TimeSheetForm(forms.ModelForm):
         }
 
 
+class TimeForm(forms.ModelForm):
+    class Meta:
+        model = TblTime
+
+        fields = ['hours', 'note']
+
+        labels = {
+            'hours': _('Hours'),
+            'note': _('Note')
+        }
+
+        widgets = {
+            'note': forms.Textarea(attrs={'rows': 5, 'cols': 50})
+        }
+
 class ToDoForm(forms.ModelForm):
     class Meta:
         model = TblToDoList
@@ -120,4 +135,17 @@ class ExpenseForm(forms.ModelForm):
         labels = {
             'expense_category_id': _('Item'),
             'expense_amount': _('Amount')
+        }
+
+
+class EngagementForm(forms.ModelForm):
+    class Meta:
+        model = TblEngagements
+
+        fields = ['provider', 'parent', 'start_date',
+                  'time_code','fye', 'type','proj_manager', 'employee' ]
+
+        widgets = {
+            'fye': DatePickerInput,
+            'start_date': DatePickerInput
         }

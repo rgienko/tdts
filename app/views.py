@@ -123,6 +123,36 @@ def deleteToDoListEntry(request, pk):
 
     return render(request, 'deltodolistentry.html', context)
 
+def addEngagement(request):
+
+    if request.method == 'POST':
+        form = EngagementForm(request.POST)
+
+        # first_name = request.POST.get('first_name')
+
+        who = request.POST.get('provider')
+        what = request.POST.get('time_code')
+        when = request.POST.get('fye')
+        when = when[:4]
+        how = request.POST.get('type')
+        srgid = who + "." + str(what) + "." + str(
+            when) + "." + how
+        print(srgid)
+
+
+        if form.is_valid():
+            new_engagement = form.save(commit=False)
+            new_engagement.srg_id = srgid
+            new_engagement.save()
+
+            return redirect('add-engagement')
+    else:
+        form = EngagementForm()
+
+    context = {'form':form}
+
+    return render(request, 'add_engagement.html', context)
+
 
 @login_required()
 def editToDoListEntry(request, pk):
@@ -250,6 +280,75 @@ class BulkTimeSheet(TemplateView):
             return redirect(reverse_lazy('timesheet'))
 
         return self.render_to_response({'timesheet_formset': formset})
+
+class StaffDashboard(TemplateView):
+
+    template_name = 'timesheet_v2.html'
+
+    today = date.today()
+    week_beg = today - timedelta(days=today.weekday())
+    week_end = week_beg + timedelta(days=5)
+    thirty = date.today() - timedelta(days=30)
+
+    def get(self, *args, **kwargs):
+
+        add_time_form = TimeForm(self.request.POST)
+        my_current_engagements = TblEngagements.objects.filter(employee_id=self.request.user.username)
+
+        timesheet_total = TblTime.objects.filter(employee_id=self.request.user.username).order_by('-date')
+
+        top_engagements_agg = timesheet_total.values('engagement', 'engagement__srg_id',
+                                                     'engagement__provider',
+                                                     'engagement__provider__provider_name',
+                                                     'engagement__time_code',
+                                                     'engagement__time_code__time_code_description',
+                                                     'engagement__fye', 'engagement__proj_manager__username',
+                                                     'engagement__employee', 'engagement__is_complete').annotate(
+            sum_of_project_hours=Sum('hours')).order_by('-sum_of_project_hours')
+
+        current_timesheet = timesheet_total.filter(employee_id=self.request.user.username).filter(
+            date__lte=self.week_end).filter(date__gte=self.week_beg).order_by('date')
+
+        fixed_hours = current_timesheet.filter(engagement__type_id='F').aggregate(sum_of_hours=Sum('hours'))
+        hourly_hours = current_timesheet.filter(engagement__type_id='H').aggregate(sum_of_hours=Sum('hours'))
+        contingency_hours = current_timesheet.filter(engagement__type_id='C').aggregate(sum_of_hours=Sum('hours'))
+        non_hours = current_timesheet.filter(engagement__type_id='N').aggregate(sum_of_hours=Sum('hours'))
+
+        total_hours = current_timesheet.aggregate(sum_of_hours=Sum('hours'))
+
+
+
+
+
+        context = {'today': self.today, 'week_beg': self.week_beg,
+                   'week_end': self.week_end, 'my_current_engagements': my_current_engagements,
+                   'top_engagements_agg': top_engagements_agg, 'fixed_hours': fixed_hours,
+                   'hourly_hours':hourly_hours, 'contingency_hours': contingency_hours,
+                   'non_hours':non_hours, 'total_hours': total_hours, 'add_time_form': add_time_form}
+
+
+
+        return  self.render_to_response(context)
+
+
+    def post(self, *args, **kwargs):
+
+        add_time_form = TimeForm(self.request.POST)
+        engagement_id = self.request.POST.get('engagement-input')
+        print(engagement_id)
+
+        engagement_instance = get_object_or_404(TblEngagements, srg_id=engagement_id)
+
+        if add_time_form.is_valid():
+            new_entry = add_time_form.save(commit=False)
+            new_entry.employee_id = get_object_or_404(TblEmployee, pk=self.request.user.username)
+            new_entry.date = self.today
+            new_entry.engagement = engagement_instance
+            new_entry.save()
+            return redirect(reverse_lazy('staff-dashboard'))
+
+        context={'add_time_form': add_time_form}
+        return self.render_to_response(context)
 
 
 class TimesheetView(PermissionRequiredMixin, TemplateView):

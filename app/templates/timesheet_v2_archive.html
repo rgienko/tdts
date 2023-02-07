@@ -1,0 +1,263 @@
+{% extends 'layout.html' %}
+{% load crispy_forms_filters %}
+
+{% block content %}
+    {% load humanize %}
+    {% load crispy_forms_tags %}
+    <div class="container-fluid mt-4">
+        <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-between">
+            <div class="col-xl-3 col-lg-12 col-md-12 col-sm-12 col-12 rounded-4 text-start border">
+                <h2 class="display-6 fw-normal  text-white">{{ user.first_name }}'s Timesheet</h2>
+                <h4 class="fw-normal text-white">Today: {{ today|date:'D m/d/Y' }}</h4>
+                <h4 class="fw-normal text-white">Week: {{ week_beg|date:'D m/d/Y' }} - {{ week_end|date:'D m/d/Y' }}</h4>
+            </div>
+
+            <div class="col-xl-8 rounded-4 text-start p-1">
+                <div class="row d-flex justify-content-evenly">
+                    <div class="col-xl-2 border-bottom">
+                        <h5 class="text-center text-white">Weekly Total</h5>
+                        <h2 class="display-3 text-center text-white">{% if total_hours.sum_of_hours is None %}0.00{% else %}{{ total_hours.sum_of_hours }}{% endif %}</h2>
+                    </div>
+
+                    <div class="col-xl-2 border-bottom">
+                        <h5 class="text-center text-white">Fixed</h5>
+                        <h2 class="display-3 text-center text-white">{% if fixed_hours.sum_of_hours is None  %}{% else %}{{ fixed_hours.sum_of_hours }}{% endif %}</h2>
+                    </div>
+                    <div class="col-xl-2 border-bottom">
+                        <h5 class="text-center text-white">Hourly</h5>
+                        <h2 class="display-3 text-center text-white">{% if hourly_hours.sum_of_hours is None  %}{% else %}{{ hourly_hours.sum_of_hours }}{% endif %}</h2>
+                    </div>
+                    <div class="col-xl-2 border-bottom">
+                        <h5 class="text-center text-white">Contingency</h5>
+                        <h2 class="display-3 text-center text-white">{% if contingency_hours.sum_of_hours is None  %}{% else %}{{ contingency_hours.sum_of_hours }}{% endif %}</h2>
+                    </div>
+                    <div class="col-xl-2 border-bottom">
+                        <h5 class="text-center text-white">Non-Billable</h5>
+                        <h2 class="display-3 text-center text-white">{% if non_hours.sum_of_hours is None  %}{% else %}{{ non_hours.sum_of_hours }}{% endif %}</h2>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="row srg-bg-primary rounded-4 p-2 text-white d-flex justify-content-between mt-4">
+
+            <div class="col-xl-8 col-lg-8 col-md-12 col-sm-12 col-12 border rounded-2 pt-3">
+                <h4 class="text-center text-white">Top Projects - Last 30 Days</h4>
+                <table class="table table-small text-light">
+                    <thead>
+                        <tr>
+                            <th>Engagement</th>
+                            <th>Provider</th>
+                            <th>Scope</th>
+                            <th>FYE</th>
+                            <th>Hours</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rec in top_engagements_agg %}
+                            <tr>
+                                <td>
+                                    <a class="srg-link" id="list-{{ rec.engagement__srg_id }}-list" data-bs-toggle="list" href="#list-{{ forloop.counter }}" role="tab" aria-controls="{{ rec.engagement__srg_id }}">
+
+                                        {{ rec.engagement__srg_id }}
+                                    </a>
+                                </td>
+                                <td>{{ rec.engagement__provider }}-{{ rec.engagement__provider__provider_name }}</td>
+                                <td>{{ rec.engagement__time_code }}-{{ rec.engagement__time_code__time_code_description }}</td>
+                                <td>{{ rec.engagement__fye|date:'m/d/Y' }}</td>
+                                <td>{{ rec.sum_of_rec_hours }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+
+            <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12 border rounded-2 pt-3 mt-md-4 text-white">
+                <h4 class="text-center text-white">Weekly Hours Total</h4>
+                <h1 class="display-1 text-center text-white">{% if total_hours.sum_of_hours is None %}0.00{% else %}{{ total_hours.sum_of_hours }}{% endif %}</h1>
+
+
+                <div class="tab-content" id="nav-tabContent">
+                    <h4>Project Information:</h4>
+                    {% for rec in top_engagements_agg %}
+                        <div class="tab-pane {% if forloop.counter == 1 %}active{% else %}{% endif %}" id="list-{{ forloop.counter }}" role="tabpanel" aria-labelledby="list-{{ rec.engagement__srg_id }}-list">
+                            {{ rec.getParentName }}<br>
+                            {{ rec.engagement__provider }} {{ rec.engagement__provider__provider_name }}<br>
+                            {{ rec.time_code }}<br>
+                            Manager: {{ rec.manager  }}<br>
+                            Staff: {{ rec.employee }}<br>
+                            Complete: {{ rec.is_complete }}<br>
+
+                            <div class="d-grid gap-2 d-md-block mt-2">
+                                <a type="button" class=" text-decoration-none srg-btn-primary open-modal-button"
+                                   id="modal-{{ rec.srg_id }}-modal"
+                                   data-bs-toggle="modal"
+                                   data-bs-target="#modal-{{ forloop.counter }}"
+                                   data-id="{{ rec.srg_id }}"
+                                   href="#modal-{{ forloop.counter }}-modal"
+                                   aria-controls="{{ rec.srg_id }}"
+                                   data-bs-whatever="{{ rec.srg_id }}">
+                                        <i class="bi bi-clock"></i> Add Hours
+                                </a>
+
+                                <a type="button" class=" text-decoration-none srg-success-button"
+                                   id="modal-{{ rec.srg_id }}-modal"
+                                   data-bs-toggle="modal"
+                                   data-bs-target="#modal-{{ forloop.counter }}"
+                                   data-id="{{ rec.srg_id }}"
+                                   href="#modal-{{ forloop.counter }}-modal"
+                                   aria-controls="{{ rec.srg_id }}"
+                                   data-bs-whatever="{{ rec.srg_id }}">
+                                        <i class="bi bi-currency-dollar"></i> Add Expense
+                                </a>
+
+                            </div>
+
+
+                        </div>
+
+                        <script>
+                            $(document).ready(function() {
+                                $('.open-modal-button').click(function() {
+                                    const objectId = $(this).data('id');
+                                    $('#object-id-{{ forloop.counter }}').text(objectId);
+                                    $('#my-input-{{ forloop.counter }}').text(objectId);
+                                });
+                            })
+                        </script>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+
+
+
+
+        <div class="row srg-border d-flex justify-content-between p-2 mt-3">
+            <div class="col-xl-8 col-lg-8 col-md-12 col-sm-12 col-12 srg-border" id="list-tab" role="tablist">
+                    <h4>My Projects</h4>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Engagement</th>
+                            <th>Provider</th>
+                            <th>Scope</th>
+                            <th>FYE</th>
+                        </tr>
+                    </thead>
+                    {% for rec in my_current_engagements %}
+                        <tr>
+                            <td>
+                                <a class="srg-link" id="list-{{ rec.srg_id }}-list" data-bs-toggle="list" href="#list-{{ forloop.counter }}" role="tab" aria-controls="{{ rec.srg_id }}">
+                                    {{ rec.srg_id }}
+                                </a>
+                            </td>
+                            <td>{{ rec.provider }}</td>
+                            <td>{{ rec.time_code }}</td>
+                            <td>{{ rec.fye|date:'m/d/Y' }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            <!--
+                {% for rec in my_current_engagements %}
+                    <a class="srg-link" id="list-{{ rec.srg_id }}-list" data-bs-toggle="list" href="#list-{{ forloop.counter }}" role="tab" aria-controls="{{ rec.srg_id }}">
+                        {{ rec.srg_id }} - {{ rec.provider }}-{{ rec.time_code }}-{{ rec.fye|date:'m/d/Y' }}<br>
+                    </a>
+                {% endfor %}
+             -->
+            </div>
+            <div class="col-xl-3 srg-border">
+                <div class="tab-content" id="nav-tabContent">
+                    <h4>Project Information:</h4>
+                    {% for rec in my_current_engagements %}
+                        <div class="tab-pane {% if forloop.counter == 1 %}active{% else %}{% endif %}" id="list-{{ forloop.counter }}" role="tabpanel" aria-labelledby="list-{{ rec.srg_id }}-list">
+                            {{ rec.getParentName }}<br>
+                            {{ rec.provider }}<br>
+                            {{ rec.time_code }}<br>
+                            Manager: {{ rec.manager  }}<br>
+                            Staff: {{ rec.employee }}<br>
+                            Complete: {{ rec.is_complete }}<br>
+
+                            <div class="d-grid gap-2 d-md-block mt-2">
+                                <a type="button" class=" text-decoration-none srg-btn-primary open-modal-button"
+                                   id="modal-{{ rec.srg_id }}-modal"
+                                   data-bs-toggle="modal"
+                                   data-bs-target="#modal-{{ forloop.counter }}"
+                                   data-id="{{ rec.srg_id }}"
+                                   href="#modal-{{ forloop.counter }}-modal"
+                                   aria-controls="{{ rec.srg_id }}"
+                                   data-bs-whatever="{{ rec.srg_id }}">
+                                        <i class="bi bi-clock"></i> Add Hours
+                                </a>
+
+                                <a type="button" class=" text-decoration-none srg-success-button"
+                                   id="modal-{{ rec.srg_id }}-modal"
+                                   data-bs-toggle="modal"
+                                   data-bs-target="#modal-{{ forloop.counter }}"
+                                   data-id="{{ rec.srg_id }}"
+                                   href="#modal-{{ forloop.counter }}-modal"
+                                   aria-controls="{{ rec.srg_id }}"
+                                   data-bs-whatever="{{ rec.srg_id }}">
+                                        <i class="bi bi-currency-dollar"></i> Add Expense
+                                </a>
+
+                            </div>
+
+
+                        </div>
+
+                        <script>
+                            $(document).ready(function() {
+                                $('.open-modal-button').click(function() {
+                                    const objectId = $(this).data('id');
+                                    $('#object-id-{{ forloop.counter }}').text(objectId);
+                                    $('#my-input-{{ forloop.counter }}').text(objectId);
+                                });
+                            })
+                        </script>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {% for rec in my_current_engagements %}
+                <div class="modal fade" id="modal-{{ forloop.counter }}" tabindex="-1" aria-labelledby="modal-{{ rec.srg_id }}-modal" aria-hidden="true">
+                    <div class="modal-dialog" id="modal">
+                        <div class="modal-content">
+                            <div class="modal-header srg-bg-primary text-light">
+                                Record Hours
+                            </div>
+                            <div class="modal-body">
+                                {{ rec.getParentName }}<br>
+                                {{ rec.provider }}<br>
+                                {{ rec.time_code }}<br>
+                                Manager: {{ rec.manager  }}<br>
+                                Staff: {{ rec.employee }}<br>
+                                Complete: {{ rec.is_complete }}<br>
+                                ID: <span id="object-id-{{ forloop.counter }}"></span>
+
+                                <form class="" method="POST">
+                                    {% csrf_token %}
+                                        <label for="my-input-{{ forloop.counter }}">Engagement:</label><br>
+                                        <input disabled="true" name="engagement-input" type="text" id="my-input-{{ forloop.counter }}" value="{{ rec.srg_id }}"/><br>
+                                    {% for field in add_time_form %}
+                                        <div class="fieldWrapper mb-3">
+                                            {{ field.label_tag }} <br>{{ field }}
+                                            {% if field.help_text %}
+                                            <p class="help">{{ field.help_text|safe }}</p>
+                                            {% endif %}
+                                        </div>
+
+                                    {% endfor %}
+                                    <button class="srg-btn-primary my-2">Add Hours</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+{% endblock %}

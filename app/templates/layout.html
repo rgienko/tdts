@@ -50,6 +50,9 @@
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="my-list navbar-nav me-auto mb-2 mb-lg-0" data-bs-toggle="list">
                             <li class="nav-item">
+                                <a class="nav-link" aria-current="true"  href="{% url 'staff-dashboard' %}">Dashboard</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link" aria-current="true"  href="{% url 'timesheet' %}">My Timesheet</a>
                             </li>
                             <li class="nav-item">
@@ -73,6 +76,9 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'srg-expense' %}">SRG Expense Report</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'add-engagement' %}">Add Engagement</a>
                             </li>
                         </ul>
                         <div class="btn-group">
